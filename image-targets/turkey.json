@@ -1,0 +1,23 @@
+{
+  "imagePath": "image-targets/turkey_luminance.png",
+  "metadata": null,
+  "name": "turkey",
+  "type": "PLANAR",
+  "properties": {
+    "left": 180,
+    "top": 0,
+    "width": 1113,
+    "height": 1484,
+    "isRotated": true,
+    "originalWidth": 1472,
+    "originalHeight": 1484
+  },
+  "resources": {
+    "originalImage": "turkey_original.png",
+    "croppedImage": "turkey_cropped.png",
+    "thumbnailImage": "turkey_thumbnail.png",
+    "luminanceImage": "turkey_luminance.png"
+  },
+  "created": 1783536881998,
+  "updated": 1783536881998
+}
