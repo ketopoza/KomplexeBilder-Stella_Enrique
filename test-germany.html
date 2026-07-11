@@ -1,0 +1,523 @@
+<!doctype html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Germany Dev — Rings & Target</title>
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; overflow: hidden; font-family: 'Newsreader', serif; }
+    #controls { position: fixed; top: 12px; left: 50%; transform: translateX(-50%); z-index: 10; display: flex; gap: 8px; align-items: center; background: rgba(255,255,255,0.9); padding: 6px 14px; border-radius: 4px; font-size: 14px; }
+    #controls button { font-family: inherit; padding: 4px 14px; cursor: pointer; border: 1px solid #999; background: #fff; border-radius: 3px; }
+    #controls label { display: flex; align-items: center; gap: 4px; }
+    #controls input[type="range"] { width: 100px; }
+    #info { position: fixed; bottom: 12px; left: 12px; z-index: 10; color: rgba(0,0,0,0.5); font-size: 13px; background: rgba(255,255,255,0.8); padding: 6px 10px; border-radius: 4px; }
+  </style>
+</head>
+<body>
+  <div id="controls">
+    <span style="font-weight:600;margin-right:6px">Germany</span>
+    <button id="reload">↻ Reload</button>
+
+  </div>
+  <div id="info">🖱 Drag to orbit • Scroll to zoom • Right-drag to pan</div>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+
+  <script type="module">
+    import * as THREE from 'three'
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
+    import { FontLoader } from 'three/addons/loaders/FontLoader.js'
+    import { TextGeometry } from 'three/addons/geometries/TextGeometry.js'
+
+    // ---- data ----
+    const ringMat = new THREE.MeshBasicMaterial({ color: "red", side: THREE.DoubleSide, transparent: true, opacity: 0.75 })
+    const aRingMat = new THREE.MeshBasicMaterial({ color: "blue", side: THREE.DoubleSide, transparent: true, opacity: 0.75 })
+    const emptyMat = new THREE.MeshBasicMaterial({ color: "grey", side: THREE.DoubleSide, transparent: true, opacity: 0.75 })
+    const demoLineColor = 0xffea00
+    const autoLineColor = 0xEA00FF
+
+    const rings = [
+      { inner: 0.30, outer: 0.43, material: ringMat, end: 120 },
+      { inner: 0.37, outer: 0.55, material: aRingMat, end: 160 },
+      { inner: 0.55, outer: 0.68, material: aRingMat, end: 200 },
+      { inner: 0.72, outer: 0.8, material: emptyMat, end: 240 },
+    ]
+
+       const textEntries = [
+      { year: '1918_Weimar Republic founded', text: 'After WWI and the November Revolution, the Weimar Constitution establishes a parliamentary democracy with universal suffrage and civil rights.\nA period of political instability, economic crisis, and cultural flowering.', y: 0.10 },
+      { year: '1923_Autocratization (1923–1939)', text: 'After the failed Beer Hall Putsch and the crisis of the Weimar Republic, authoritarian tendencies grow.\nFrom 1923 to 1939, democratic institutions are weakened by emergency rule, nationalist radicalization, and the rise of centralized power.', y: 0.50 },
+      { year: '1933_1945_The II Reich', text: 'After 1933, Nazi Germany becomes a totalitarian dictatorship.\nThe II Reich is marked by repression, war, and the destruction of democracy until its collapse in 1945.', y: 0.85 },
+      { year: '1945_Germany disappears under occupation', text: 'After the defeat in WWII, Germany no longer exists as a unified state under the peace settlement.\nThe victorious powers divide the country into occupation zones, dismantle the old political order, and begin the reconstruction of Europe.', y: 1.12 },
+    ]
+    // ---- scene ----
+    const scene = new THREE.Scene()
+    scene.background = new THREE.Color(0xf0f0f0)
+
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 50)
+    camera.position.set(0, 1, 0)
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true })
+    renderer.setSize(window.innerWidth, window.innerHeight)
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+    document.body.appendChild(renderer.domElement)
+
+    const controls = new OrbitControls(camera, renderer.domElement)
+    controls.target.set(0, 0.46, 0)
+    controls.update()
+    controls.enableDamping = true
+
+    // ---- target image (horizontal, in XZ plane) ----
+    const img = new Image()
+    img.crossOrigin = 'anonymous'
+    img.src = './image-targets/germany_original.png'
+    const texture = new THREE.Texture(img)
+    img.onload = () => { texture.needsUpdate = true }
+    texture.colorSpace = THREE.SRGBColorSpace
+
+    const imgAspect = 686 / 861
+    const targetGeo = new THREE.PlaneGeometry(imgAspect * 0.8, 0.8)
+    const targetMat = new THREE.MeshBasicMaterial({ map: texture, transparent: true, opacity: 0.4, depthWrite: false })
+    const targetMesh = new THREE.Mesh(targetGeo, targetMat)
+    targetMesh.rotation.x = -Math.PI / 2
+    targetMesh.position.set(-0.0045, 0.45, -0.01)
+    scene.add(targetMesh)
+
+    // grid helper
+    const grid = new THREE.GridHelper(2, 20, 0xcccccc, 0xdddddd)
+    grid.position.y = 0.46
+    scene.add(grid)
+
+    // ---- rings + text ----
+    const animGroup = new THREE.Group()
+    animGroup.position.y = 0.46
+    scene.add(animGroup)
+
+    const targetLength = -Math.PI / 2
+
+    function easeInOutQuad(t) {
+      return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t
+    }
+
+    function getLength(frame, end) {
+      return targetLength * easeInOutQuad(Math.min(frame / end, 1))
+    }
+
+    function createRingGeometry(inner, outer, length) {
+      const sweep = length === 0 ? 0.001 : length
+      return new THREE.RingGeometry(inner, outer, 64, 1, Math.PI, sweep)
+    }
+
+    function mixColorHex(hex, amount) {
+      const r = (hex >> 16) & 0xff, g = (hex >> 8) & 0xff, b = hex & 0xff
+      return (Math.round(255 + (r - 255) * amount) << 16) | (Math.round(255 + (g - 255) * amount) << 8) | Math.round(255 + (b - 255) * amount)
+    }
+
+    const lineThickness = 0.008
+    const lineCylGeo = new THREE.CylinderGeometry(lineThickness, lineThickness, 1, 4, 1)
+    const planePad = 0.096
+
+    let ringMeshes = []
+    let prevRingLen = []
+    let textGroups = []
+    let selectedBox = -1
+    let ringFullColor = []
+    let textContainer = new THREE.Group()
+
+    const SCALE = 0.13
+
+    function measureText(text, fontSize) {
+      const canvas = document.createElement('canvas')
+      const ctx = canvas.getContext('2d')
+      ctx.font = `${fontSize}px Newsreader`
+      const metrics = ctx.measureText(text)
+      return { width: metrics.width, height: fontSize * 1.2 }
+    }
+
+    function to3D(px) { return px * 0.002 }
+
+    function updateLine(item) {
+      const topLeft = item.group.position.clone()
+      const mid = new THREE.Vector3().addVectors(item.ringPos, topLeft).multiplyScalar(0.5)
+      const dir = new THREE.Vector3().subVectors(topLeft, item.ringPos).normalize()
+      const dist = item.ringPos.distanceTo(topLeft)
+      item.line.position.copy(mid)
+      item.line.scale.set(1, dist, 1)
+      item.line.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir)
+    }
+
+    function getColor(entry, rings) {
+      let closest = rings[0]
+      let minDist = Math.abs(entry.y - closest.inner)
+      for (let i = 1; i < rings.length; i++) {
+        const dist = Math.abs(entry.y - rings[i].inner)
+        if (dist < minDist) { minDist = dist; closest = rings[i] }
+      }
+      if (closest.material === ringMat) return demoLineColor
+      if (closest.material === emptyMat) return 0x999999
+      return autoLineColor
+    }
+
+    async function createTextGroups(rings, textEntries) {
+      const group = textContainer
+      const lineSpacing = 0.005
+
+      const groupMeta = textEntries.map((entry, i) => {
+        const color = rings[i].material === ringMat ? demoLineColor : rings[i].material === emptyMat ? 0x999999 : autoLineColor
+        const labelParts = entry.year.split('\n')
+        const title = labelParts[0]
+        const subtitle = labelParts.length > 1 ? labelParts.slice(1).join(' ').trim() : ''
+        const { width: titleWidth, height: titleHeight } = measureText(title, 80)
+        const subMetrics = subtitle ? measureText(subtitle, 50) : { width: 0, height: 0 }
+        const lines = entry.text.split('\n')
+        const lineData = lines.map(line => {
+          const { width, height } = measureText(line, 50)
+          return { width, height, chars: line.length }
+        })
+        const bodyWidth = lineData.length ? Math.max(...lineData.map(l => l.width)) : 0
+        const bodyHeight = lineData.reduce((sum, line) => sum + line.height, 0) + Math.max(0, lineData.length - 1) * lineSpacing * 50
+
+        const subHeight = subMetrics.height
+        const titleH3 = to3D(titleHeight)
+        const subH3 = to3D(subHeight)
+        const bodyH3 = to3D(bodyHeight)
+
+        const imgKey = entry.img || title.split(/[_\s]/)[0]
+        const imgSrc = './src/assets/' + imgKey + '.png'
+
+        return { title, subtitle, titleWidth, titleHeight, subHeight, subMetrics, bodyWidth, bodyHeight, lineData, titleH3, subH3, bodyH3, color, entry, imgSrc }
+      })
+
+      const loadImage = src => new Promise(resolve => {
+        const img = new Image()
+        img.onload = () => resolve(img)
+        img.onerror = () => resolve(null)
+        img.src = src
+      })
+      const images = await Promise.all(groupMeta.map(d => loadImage(d.imgSrc)))
+
+      const groupData = groupMeta.map((d, i) => {
+        const img = images[i]
+        const margin = 24
+        const gap = 20
+        const photoMaxW = 520
+        let photoDrawW = 0, photoDrawH = 0, capH = 0, capW = 0
+        let expCanvasW, expCanvasH
+        let planeH, maxW3
+
+        if (img) {
+          photoDrawW = Math.min(img.naturalWidth, photoMaxW) * (d.entry.photoScale || 1)
+          photoDrawH = (img.naturalHeight / img.naturalWidth) * photoDrawW
+          const capText = d.entry.caption || ''
+          if (capText) {
+            const capLines = capText.split('\n')
+            let maxCapW = 0
+            for (const line of capLines) {
+              const m = measureText(line, 30)
+              if (m.width > maxCapW) maxCapW = m.width
+            }
+            capH = capLines.length * (30 * 1.2) + Math.max(0, capLines.length - 1) * 4
+            capW = maxCapW
+          }
+          const sectionY = margin + d.titleHeight + 10
+          const textLines = d.entry.text ? d.entry.text.split('\n').length : 0
+          const textH = textLines * (50 * 1.2) + Math.max(0, textLines - 1) * 4
+          const sectionH = Math.max(photoDrawH, textH)
+          expCanvasH = Math.ceil(sectionY + sectionH + 10 + capH + margin)
+          const rightColW = Math.max(d.titleWidth, d.bodyWidth)
+          expCanvasW = Math.max(d.titleWidth, margin + photoDrawW + gap + rightColW + margin)
+          planeH = to3D(expCanvasH)
+          maxW3 = to3D(expCanvasW)
+        } else {
+          planeH = d.titleH3 + (d.subH3 > 0 ? 0.20 + d.subH3 : 0) + (d.bodyH3 > 0 ? 0.20 + d.bodyH3 : 0) + planePad
+          maxW3 = to3D(Math.max(d.titleWidth, d.subMetrics.width, d.bodyWidth)) + planePad
+          expCanvasH = Math.ceil(planeH / 0.002)
+          expCanvasW = Math.max(d.titleWidth, d.subMetrics.width, d.bodyWidth) + 48
+        }
+
+        const collW3 = to3D(d.titleWidth * 1.15) + 0.04
+        const collH3 = d.titleH3 + 0.04
+
+        const collCanvasW = Math.ceil(d.titleWidth * 1.15) + 20
+        const collCanvasH = Math.ceil(collH3 / 0.002)
+
+        const collCanvas = document.createElement('canvas')
+        collCanvas.width = collCanvasW
+        collCanvas.height = collCanvasH
+        const collCtx = collCanvas.getContext('2d')
+        collCtx.fillStyle = '#ffffff'
+        collCtx.fillRect(0, 0, collCanvas.width, collCanvas.height)
+        collCtx.fillStyle = '#000'
+        collCtx.font = `bold 80px Newsreader`
+        collCtx.textBaseline = 'top'
+        collCtx.fillText(d.title, 2, 12)
+        const collTex = new THREE.CanvasTexture(collCanvas)
+        collTex.needsUpdate = true
+
+        const expCanvas = document.createElement('canvas')
+        expCanvas.width = expCanvasW
+        expCanvas.height = expCanvasH
+        const expCtx = expCanvas.getContext('2d')
+        expCtx.fillStyle = '#ffffff'
+        expCtx.fillRect(0, 0, expCanvas.width, expCanvas.height)
+        expCtx.fillStyle = '#000'
+        expCtx.textBaseline = 'top'
+
+        if (img) {
+          const sectionY = margin + d.titleHeight + 10
+          expCtx.font = `bold 80px Newsreader`
+          expCtx.fillText(d.title, margin, margin)
+          expCtx.drawImage(img, margin, sectionY, photoDrawW, photoDrawH)
+          const textX = margin + photoDrawW + gap
+          expCtx.font = `50px Newsreader`
+          d.entry.text.split('\n').forEach((line, li) => {
+            expCtx.fillText(line, textX, sectionY + li * (50 * 1.2 + 4))
+          })
+          const capY = sectionY + photoDrawH + 10
+          if (d.entry.caption) {
+            expCtx.font = `30px Newsreader`
+            expCtx.fillStyle = '#888888'
+            d.entry.caption.split('\n').forEach((line, li) => {
+              expCtx.fillText(line, margin, capY + li * (30 * 1.2 + 4))
+            })
+            expCtx.fillStyle = '#000'
+          }
+        } else {
+          expCtx.font = `bold 80px Newsreader`
+          expCtx.fillText(d.title, 24, 24)
+          let y = 24 + d.titleHeight + 10
+          if (d.subtitle) {
+            expCtx.font = `50px Newsreader`
+            expCtx.fillText(d.subtitle, 24, y)
+            y += d.subHeight + 10
+          }
+          if (d.entry.text) {
+            expCtx.font = `50px Newsreader`
+            d.entry.text.split('\n').forEach(line => {
+              expCtx.fillText(line, 24, y)
+              y += 50 * 1.2 + 4
+            })
+          }
+        }
+        const expTex = new THREE.CanvasTexture(expCanvas)
+        expTex.needsUpdate = true
+
+        return { titleWidth: d.titleWidth, titleHeight: d.titleHeight, subHeight: d.subHeight, bodyWidth: d.bodyWidth, bodyHeight: d.bodyHeight, planeH, maxW3, collW3, collH3, color: d.color, entry: d.entry, collTex, expTex, photoDrawW, photoDrawH, capH }
+      })
+
+      groupData.forEach((d, index) => {
+        const tg = new THREE.Group()
+
+        const planeMat = new THREE.MeshBasicMaterial({ map: d.collTex, transparent: true, side: THREE.DoubleSide })
+        const collGeo = new THREE.PlaneGeometry(d.collW3, d.collH3)
+        collGeo.translate(d.collW3 / 2, -d.collH3 / 2, 0)
+        const expGeo = new THREE.PlaneGeometry(d.maxW3, d.planeH)
+        expGeo.translate(d.maxW3 / 2, -d.planeH / 2, 0)
+        const planeMesh = new THREE.Mesh(collGeo, planeMat)
+        planeMesh.rotation.x = -Math.PI / 2
+        planeMesh.position.set(0, 0, 0)
+        tg.add(planeMesh)
+
+        const ringOuter = rings[index].outer
+        const restZ = -index * 0.01
+        const endPos = new THREE.Vector3(0.4, 0, ringOuter + restZ)
+        const origPos = new THREE.Vector3(0, 0, ringOuter)
+
+        tg.position.copy(endPos)
+        group.add(tg)
+
+        const lineMat = new THREE.MeshBasicMaterial({ color: 0xffffff })
+        const line = new THREE.Mesh(lineCylGeo, lineMat)
+        const lineEnd = endPos.clone()
+        const mid = new THREE.Vector3().addVectors(origPos, lineEnd).multiplyScalar(0.5)
+        const dir = new THREE.Vector3().subVectors(lineEnd, origPos).normalize()
+        const dist = origPos.distanceTo(lineEnd)
+        line.position.copy(mid)
+        line.scale.set(1, dist, 1)
+        line.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir)
+        line.visible = false
+        animGroup.add(line)
+        tg.visible = false
+
+        textGroups.push({
+          group: tg, line,
+          planeMesh, collTex: d.collTex, expTex: d.expTex,
+          collGeo, expGeo,
+          showDetail: false,
+          ringPos: origPos.clone(),
+          startPos: origPos.clone(),
+          endPos: endPos.clone(),
+          startFrame: rings[index].end,
+          progress: 0,
+          lineColor: d.color,
+          restZ,
+          origZ: ringOuter,
+        })
+      })
+    }
+
+    function pickText(x, y) {
+      const raycaster = new THREE.Raycaster()
+      const mouse = new THREE.Vector2()
+      const canvas = renderer.domElement
+      mouse.x = (x / canvas.clientWidth) * 2 - 1
+      mouse.y = -(y / canvas.clientHeight) * 2 + 1
+      raycaster.setFromCamera(mouse, camera)
+      const items = []
+      textGroups.forEach((item, i) => {
+        item.group.children.forEach(c => { if (c.isMesh) items.push({ mesh: c, i }) })
+      })
+      ringMeshes.forEach((mesh, i) => {
+        items.push({ mesh, i })
+      })
+      const hit = raycaster.intersectObjects(items.map(t => t.mesh))
+      if (hit.length > 0) {
+        const found = items.find(t => t.mesh === hit[0].object)
+        return found ? found.i : -1
+      }
+      return -1
+    }
+
+    function selectText(i) {
+      textGroups.forEach((item, idx) => {
+        const isSelected = idx === i
+        const highlighted = i >= 0 && isSelected
+        item.group.scale.set(1, 1, 1)
+        item.group.position.z = item.origZ + item.restZ
+        if (item.showDetail !== isSelected) {
+          item.showDetail = isSelected
+          item.planeMesh.material.map = isSelected ? item.expTex : item.collTex
+          item.planeMesh.material.needsUpdate = true
+          item.planeMesh.geometry.dispose()
+          item.planeMesh.geometry = isSelected ? item.expGeo : item.collGeo
+        }
+        item.planeMesh.material.transparent = true
+        item.planeMesh.material.opacity = 1
+        item.planeMesh.material.color.setHex(highlighted ? mixColorHex(item.lineColor, 0.15) : 0xffffff)
+        item.line.material.color.setHex(highlighted ? item.lineColor : 0xffffff)
+        updateLine(item)
+      })
+      ringMeshes.forEach((mesh, j) => {
+        mesh.material.color.setHex(0xffffff)
+        mesh.material.opacity = 0.75
+      })
+      selectedBox = i
+      if (i >= 0) {
+        textGroups[i].group.scale.set(2, 2, 2)
+        textGroups[i].group.position.z = 0.5
+        ringMeshes[i].material.color.setHex(ringFullColor[i])
+        ringMeshes[i].material.opacity = 0.9
+      }
+    }
+
+    renderer.domElement.addEventListener('click', (e) => {
+      const idx = pickText(e.clientX, e.clientY)
+      selectText(idx >= 0 ? idx : -1)
+    })
+
+    function buildScene() {
+      // clear
+      ringMeshes.forEach(m => { animGroup.remove(m); if (m.geometry) m.geometry.dispose() })
+      textGroups.forEach(item => {
+        animGroup.remove(item.group)
+        animGroup.remove(item.line)
+      })
+      // clear textContainer
+      while (textContainer.children.length) {
+        const c = textContainer.children[0]
+        if (c.geometry) c.geometry.dispose()
+        if (c.material) { if (c.material.map) c.material.map.dispose(); c.material.dispose() }
+        textContainer.remove(c)
+      }
+      ringMeshes = []
+      prevRingLen = []
+      textGroups = []
+      selectedBox = -1
+
+      animGroup.scale.set(SCALE, SCALE, SCALE)
+      if (!textContainer.parent) animGroup.add(textContainer)
+
+      ringFullColor = rings.map(r => r.material === ringMat ? demoLineColor : autoLineColor)
+
+      // rings
+      rings.forEach((ring, ri) => {
+        const geo = createRingGeometry(ring.inner, ring.outer, targetLength)
+        const mesh = new THREE.Mesh(geo, ring.material)
+        mesh.rotation.x = -Math.PI / 2
+        mesh.position.y = 0
+        animGroup.add(mesh)
+        ringMeshes.push(mesh)
+        prevRingLen.push(targetLength)
+      })
+    }
+
+    document.fonts.load('bold 80px Newsreader').then(() => {
+      document.fonts.load('400 50px Newsreader').then(() => {
+        buildScene()
+        createTextGroups(rings, textEntries).then(() => { animate() })
+      })
+    })
+
+    // ---- animation loop ----
+    let frame = 0
+
+    function animate() {
+      requestAnimationFrame(animate)
+      controls.update()
+
+      animGroup.scale.set(SCALE, SCALE, SCALE)
+
+      // animate rings
+      ringMeshes.forEach((mesh, ri) => {
+        const ring = rings[ri]
+        const len = getLength(frame, ring.end)
+        if (Math.abs(len - prevRingLen[ri]) > 0.007) {
+          const newGeo = createRingGeometry(ring.inner, ring.outer, len)
+          mesh.geometry.dispose()
+          mesh.geometry = newGeo
+          prevRingLen[ri] = len
+        }
+      })
+
+      // animate text
+      textGroups.forEach((item) => {
+        if (frame < item.startFrame) return
+        const duration = 60
+        const elapsed = frame - item.startFrame
+        const prev = item.progress
+        item.progress = Math.min(elapsed / duration, 1)
+        if (prev < 1) {
+          const t = 1 - Math.pow(1 - item.progress, 2)
+          item.group.visible = true
+          item.group.position.lerpVectors(item.startPos, item.endPos, t)
+          updateLine(item)
+          item.line.visible = true
+        }
+      })
+
+      frame++
+      renderer.render(scene, camera)
+    }
+
+    // ---- UI ----
+    document.getElementById('reload').addEventListener('click', () => {
+      frame = 0
+      buildScene()
+      createTextGroups(rings, textEntries)
+    })
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight
+      camera.updateProjectionMatrix()
+      renderer.setSize(window.innerWidth, window.innerHeight)
+    })
+
+
+  </script>
+</body>
+</html>

@@ -1,0 +1,23 @@
+{
+  "imagePath": "image-targets/germany_luminance.png",
+  "metadata": null,
+  "name": "germany",
+  "type": "PLANAR",
+  "properties": {
+    "left": 20,
+    "top": 0,
+    "width": 646,
+    "height": 861,
+    "isRotated": false,
+    "originalWidth": 686,
+    "originalHeight": 861
+  },
+  "resources": {
+    "originalImage": "germany_original.png",
+    "croppedImage": "germany_cropped.png",
+    "thumbnailImage": "germany_thumbnail.png",
+    "luminanceImage": "germany_luminance.png"
+  },
+  "created": 1783778622624,
+  "updated": 1783778622624
+}

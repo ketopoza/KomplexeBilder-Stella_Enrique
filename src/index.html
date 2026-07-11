@@ -5,16 +5,330 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <meta name="apple-mobile-web-app-capable" content="yes">
 
-  <title>Turkey Timeline</title>
-  <link href="https://fonts.googleapis.com/css2?family=Titillium+Web:wght@400;700&display=swap" rel="stylesheet">
+  <title>Timeline AR</title>
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&display=swap" rel="stylesheet">
   <script crossorigin="anonymous" src="./external/scripts/8frame-1.5.0.min.js"></script>
-  
+
   <script src="https://cdn.jsdelivr.net/npm/@8thwall/engine-binary@1/dist/xr.js" async crossorigin="anonymous" data-preload-chunks="slam"></script>
   <script src="https://cdn.jsdelivr.net/npm/@8thwall/landing-page@1/dist/landing-page.js" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/@8thwall/xrextras@1/dist/xrextras.js" crossorigin="anonymous"></script>
+  <style>
+    #page-h1 {
+      position: fixed; top: 0; left: 0; width: 100%; text-align: center; z-index: 300;
+      color: #000; font-family: 'Newsreader', serif;
+      font-size: 28px; font-weight: 400;
+      cursor: pointer; margin: 0; padding: 20px 10px 0 0; background: #fff;
+    }
+    #page-h3 {
+      position: fixed; bottom: 0; left: 0; width: 100%; text-align: center; z-index: 300;
+      color: rgba(0,0,0,0.7); font-family: 'Newsreader', serif;
+      font-size: 16px; font-weight: 400;
+      cursor: pointer; margin: 0; padding: 10px 0px 2px 0px;
+      box-sizing: border-box; background: #fff;
+    }
+    #loading-screen {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      z-index: 400; background: #fff;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      font-family: 'Newsreader', serif;
+      transition: opacity 0.5s ease;
+    }
+    #loading-screen .load-title {
+      font-size: 28px; font-weight: 400; color: #000;
+      transition: all var(--anim-duration, 2400ms) var(--anim-easing, ease-out);
+    }
+    #loading-screen .load-sub {
+      font-size: 16px; font-weight: 400; color: rgba(0,0,0,0.7);
+      margin-top: 8px;
+      transition: all var(--anim-duration, 2400ms) var(--anim-easing, ease-out);
+    }
+    #loading-screen.animate .load-title {
+      transform: translateY(var(--title-dy, -200px));
+    }
+    #loading-screen.animate .load-sub {
+      transform: translateY(var(--sub-dy, 200px));
+    }
+    #loading-screen.done {
+      opacity: 0; pointer-events: none; transition: none;
+    }
+    #info-overlay {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      z-index: 200; display: flex; align-items: center; justify-content: center;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+      font-family: 'Newsreader', serif;
+      opacity: 0; transition: opacity 0.5s ease;
+    }
+    #info-overlay.show { opacity: 1; }
+    #info-overlay .card {
+      background: #fff; width: 100%; height: 100%;
+      padding: 40px 32px 0 32px; box-sizing: border-box;
+      text-align: center; position: relative;
+      display: flex; flex-direction: column;
+    }
+    #info-overlay .slides-wrapper {
+      flex: 1; position: relative; overflow: hidden;
+    }
+    #info-overlay .slide {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      display: flex; flex-direction: column; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity 0.3s;
+      padding: 0 0 20px 0; box-sizing: border-box;
+    }
+    #info-overlay .slide.active {
+      opacity: 1; pointer-events: auto;
+    }
+    #info-overlay .slide h2 {
+      font-size: 18px; font-weight: 400; margin: 0 0 12px 0; text-align: left;
+    }
+    #info-overlay .slide .text-box {
+      text-align: left; font-size: 12px; line-height: 1.6; margin-bottom: 16px;
+      white-space: pre-line;
+    }
+    #info-overlay hr {
+      border: none; border-top: 1px solid rgba(0,0,0,0.1); margin: 14px 0;
+    }
+    #info-overlay .legend {
+      text-align: left; font-size: 14px; line-height: 1.6; margin-bottom: 8px;
+      padding: 0; background: #fff; border-radius: 0; color: rgba(0,0,0,0.65);
+    }
+    #info-overlay .start-btn {
+      background: #fff; border: 1px solid #ffffff; border-radius: 0;
+      padding: px 0px; cursor: pointer; margin-top: 0px;
+      display: inline-flex; align-items: center; justify-content: center;
+      align-self: center;
+    }
+    .start-btn img { width: 200px; height: auto; display: block; }
+    #dots-nav {
+      display: flex; justify-content: center; gap: 10px;
+      padding: 0px 0 0px 0;
+    }
+    #dots-nav .dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: rgba(0,0,0,0.2);
+      transition: all 0.3s;
+    }
+    #dots-nav .dot.active {
+      background: rgba(0,0,0,0.8);
+      width: 10px; height: 10px;
+    }
+
+    /* contact overlay */
+    #contact-overlay {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      z-index: 350; background: rgba(0,0,0,0.3);
+      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+      font-family: 'Newsreader', serif;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.4s ease;
+      display: flex; align-items: flex-end; justify-content: center;
+    }
+    #contact-overlay.show {
+      opacity: 1; pointer-events: auto;
+    }
+    #contact-overlay .contact-card {
+      background: #fff; width: 100%; padding: 20px 32px; box-sizing: border-box;
+      transform: translateY(100%); transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+      border-radius: 20px 20px 0 0;
+    }
+    #contact-overlay.show .contact-card {
+      transform: translateY(0);
+    }
+    #contact-overlay .contact-table {
+      width: 100%; border-collapse: collapse;
+      font-family: 'Newsreader', serif;
+      font-size: 16px; font-weight: 400; color: rgba(0,0,0,0.7);
+    }
+    #contact-overlay .contact-table td {
+      width: 50%; padding: 8px 12px; vertical-align: top;
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+      white-space: pre-line;
+    }
+    #contact-overlay .contact-table tr:last-child td {
+      border-bottom: none;
+    }
+    #contact-overlay .contact-table tr:not(:first-child) td {
+      font-size: 10px;
+    }
+    #contact-overlay .contact-card .close-btn {
+      display: block; margin: 10px auto 0; background: none; border: 0;
+      padding: 0 32px; font-family: inherit; font-size: 15px; cursor: pointer; border-radius: 0;
+      color: rgba(0,0,0,0.6);
+    }
+  </style>
 </head>
 <body>
-  <script src="bundle.js"></script>
+
+  <div id="loading-screen">
+    <div class="load-title">Patterns of Democracy</div>
+    <div class="load-sub">Wilke, Stella - Poza Herranz, Enrique</div>
+  </div>
+
+  <h1 id="page-h1">Patterns of Democracy</h1>
+  <h3 id="page-h3">Wilke, Stella - Poza Herranz, Enrique</h3>
+
+  <div id="info-overlay">
+    <div class="card">
+
+      <div class="slides-wrapper">
+        <!-- slide 1 -->
+        <div class="slide active" data-index="0">
+          <h2>About</h2>
+          <div class="text-box">
+            In the framework of the collaboration between the UdK and the WZB Berlin Social Science Center, we joined the research team “Waves of Regime Transformation” under the direction of Dr. Vanessa Boese-Schlosser.<br><br>The following visualisations are based on a tree-ring diagram, in which each ring represents the yearly value of democracy according to the ERT V-Dem dataset (see About the Data). This allows us to trace patterns in regime transformation, showing the waves of democratisation and autocratisation spanning from 1900 to 2025.
+          </div>
+        
+        </div>
+
+        <!-- slide 2 -->
+        <div class="slide" data-index="1">
+          <h2>About the Data</h2>
+          <div class="text-box">
+             Each ring's value is calculated from the V-Dem Electoral Democracy Index (v2x_polyarchy), which assigns every country a score between 0 and 1 for each year, where 0 denotes a closed autocracy, characterised by the absence of free elections, political freedoms, and meaningful suffrage, and 1 denotes a full electoral democracy.<br><br>To capture sustained periods of change, we draw on the Episodes of Regime Transformation (ERT) dataset. Rather than reading the EDI year by year, the ERT dataset identifies distinct episodes of democratisation (liberalising autocracy, democratic deepening) and autocratisation (democratic regression, autocratic regression) within the V-Dem data, flagged through the dem_ep and aut_ep episode variables. It is this episodic view that allows each ring to speak not only to a single year’s value, but to the larger pattern of transformation it belongs to.
+          </div>
+        </div>
+
+        <!-- slide 3 -->
+        <div class="slide" data-index="2">
+          <h2>About the Graphic</h2>
+          <div class="text-box">
+            Reading from the centre outward, like tree rings, each diagram traces a country's democratic history from 1900 to 2025. The thickness of each ring's line reflects its Electoral Democracy Index (v2x_polyarchy). Thick lines correspond to values closer to 0, marking periods of autocracy, while thin lines correspond to values closer to 1, marking periods of democracy. Whether the line is wavy or straight traces the Episodes of Regime Transformation identified by the ERT dataset (dem_ep and aut_ep), each undulating line marking a sustained episode of democratisation or autocratisation, so that the overall pattern of the ring visualises the country’s trajectory of regime transformation over time.<br><br>The countries appear in alphabetical order, allowing for easy navigation while avoiding any implied ranking or hierarchy between them.
+          </div>
+          <button class="start-btn"> 🌲
+          </button>
+        </div>
+      </div>
+
+      <div id="dots-nav">
+        <div class="dot active" data-index="0"></div>
+        <div class="dot" data-index="1"></div>
+        <div class="dot" data-index="2"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="contact-overlay">
+    <div class="contact-card">
+      <table class="contact-table">
+        <tr><td>Wilke, Stella</td><td>Poza Herranz, Enrique</td></tr>
+        <tr><td>pronouns</td><td>he/they</td></tr>
+        <tr><td>mail</td><td>enrique.ph@hotmail.com</td></tr>
+        <tr><td>social media</td><td>@ketopoza_</td></tr>
+        <tr><td>Institution</td><td>After a double BA in Arts + Design, Enrique (aka Keto Poza) moved to Berlin landing at InfoKlasse.<br>There, he crafts an amalgam based on his interests in the city, data, and politics, with an approach that stretches the boundaries of voyeurism and speculation through science fiction.</td></tr>
+      </table>
+      <button class="close-btn">⬇️</button>
+    </div>
+  </div>
+
+  <script src="bundle-turkey.js"></script>
+  <script>
+    // slide navigation
+    const slides = document.querySelectorAll('.slide')
+    const dots = document.querySelectorAll('.dot')
+    const overlayEl = document.getElementById('info-overlay')
+
+    function goToSlide(index) {
+      slides.forEach(s => s.classList.remove('active'))
+      dots.forEach(d => d.classList.remove('active'))
+      slides[index].classList.add('active')
+      dots[index].classList.add('active')
+    }
+
+    // swipe gesture (only navigation — dots are visual indicators)
+    const wrapper = document.querySelector('.slides-wrapper')
+    let swipeStartX = 0
+    wrapper.addEventListener('touchstart', (e) => { swipeStartX = e.touches[0].clientX }, { passive: true })
+    wrapper.addEventListener('touchend', (e) => {
+      const dx = e.changedTouches[0].clientX - swipeStartX
+      const cur = parseInt(document.querySelector('.slide.active').dataset.index)
+      if (Math.abs(dx) > 40) {
+        const next = dx < 0 ? Math.min(cur + 1, slides.length - 1) : Math.max(cur - 1, 0)
+        if (next !== cur) goToSlide(next)
+      }
+    }, { passive: true })
+
+    // start button hides overlay
+    const hideOverlay = () => { overlayEl.style.display = 'none' }
+    document.querySelector('.start-btn').addEventListener('click', hideOverlay)
+    document.querySelector('.start-btn').addEventListener('touchend', (e) => { e.preventDefault(); hideOverlay() })
+
+    // H1: on slide 1 go to scanner, otherwise go to slide 1
+    const h1 = document.getElementById('page-h1')
+    const handleH1 = () => {
+      if (overlayEl.style.display === 'none') {
+        overlayEl.style.display = ''
+        goToSlide(0)
+      } else {
+        const cur = parseInt(document.querySelector('.slide.active').dataset.index)
+        if (cur === 0) {
+          hideOverlay()
+        } else {
+          goToSlide(0)
+        }
+      }
+    }
+    h1.addEventListener('click', handleH1)
+    h1.addEventListener('touchend', (e) => { e.preventDefault(); handleH1() })
+
+    // contact overlay (H3)
+    const contactOverlay = document.getElementById('contact-overlay')
+    const h3 = document.getElementById('page-h3')
+    const showContact = () => {
+      contactOverlay.classList.add('show')
+    }
+    const hideContact = () => {
+      contactOverlay.classList.remove('show')
+    }
+    h3.addEventListener('click', showContact)
+    h3.addEventListener('touchend', (e) => { e.preventDefault(); showContact() })
+    contactOverlay.addEventListener('click', hideContact)
+    document.querySelector('.close-btn').addEventListener('click', hideContact)
+    contactOverlay.querySelector('.contact-card').addEventListener('click', (e) => e.stopPropagation())
+
+    // shared animation parameters (reused for Three.js movement later)
+    const ANIM = {
+      duration: 2000,
+      delay: 300,
+      easing: 'cubic-bezier(0.25, 0.1, 0.25, 1)',
+    }
+
+    // loading animation — starts on first touch to avoid clashing with 8th Wall permission dialog
+    function startLoadingAnim() {
+      const ls = document.getElementById('loading-screen')
+      const loadTitle = ls.querySelector('.load-title')
+      const loadSub = ls.querySelector('.load-sub')
+      const h1 = document.getElementById('page-h1')
+      const h3 = document.getElementById('page-h3')
+
+      const h1Rect = h1.getBoundingClientRect()
+      const h3Rect = h3.getBoundingClientRect()
+      const titleRect = loadTitle.getBoundingClientRect()
+      const subRect = loadSub.getBoundingClientRect()
+
+      const h1Pad = parseFloat(getComputedStyle(h1).paddingTop) || 0
+      const h3Pad = parseFloat(getComputedStyle(h3).paddingTop) || 0
+      const titleDy = (h1Rect.top + h1Pad) - titleRect.top
+      const subDy = (h3Rect.top + h3Pad) - subRect.top
+
+      ls.style.setProperty('--title-dy', titleDy + 'px')
+      ls.style.setProperty('--sub-dy', subDy + 'px')
+      ls.style.setProperty('--anim-duration', ANIM.duration + 'ms')
+      ls.style.setProperty('--anim-easing', ANIM.easing)
+
+      setTimeout(() => {
+        ls.classList.add('animate')
+        setTimeout(() => {
+          ls.classList.add('done')
+          document.getElementById('info-overlay').classList.add('show')
+          setTimeout(() => { ls.style.display = 'none' }, 50)
+        }, ANIM.duration)
+      }, ANIM.delay)
+    }
+    document.addEventListener('click', startLoadingAnim, { once: true })
+    document.addEventListener('touchend', startLoadingAnim, { once: true })
+  </script>
+
   <a-scene xrextras-gesture-detector landing-page xrextras-loading xrextras-runtime-error
     renderer="colorManagement:true" xrweb="disableWorldTracking: true">
 
@@ -26,6 +340,14 @@
 
     <xrextras-named-image-target name="turkey">
       <a-entity turkey-anim position="0.03 0 0" scale="0.13 0.13 0.13"></a-entity>
+    </xrextras-named-image-target>
+
+    <!--xrextras-named-image-target name="RusiaPrueba">
+      <a-entity russia-anim position="0.03 0 0" scale="0.13 0.13 0.13"></a-entity>
+    </xrextras-named-image-target-->
+
+    <xrextras-named-image-target name="germany">
+      <a-entity germany-anim position="0.01 -0.01 0" scale="0.166 0.166 0.166"></a-entity>
     </xrextras-named-image-target>
 
   </a-scene>

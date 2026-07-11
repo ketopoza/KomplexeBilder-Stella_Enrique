@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<!-- saved from url=(0039)http://127.0.0.1:5500/test-germany.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Germany Dev — Rings &amp; Target</title>
+  <link href="./Germany Dev — Rings &amp; Target_files/css2" rel="stylesheet">
+  <style>
+    body { margin: 0; overflow: hidden; font-family: 'Newsreader', serif; }
+    #controls { position: fixed; top: 12px; left: 50%; transform: translateX(-50%); z-index: 10; display: flex; gap: 8px; align-items: center; background: rgba(255,255,255,0.9); padding: 6px 14px; border-radius: 4px; font-size: 14px; }
+    #controls button { font-family: inherit; padding: 4px 14px; cursor: pointer; border: 1px solid #999; background: #fff; border-radius: 3px; }
+    #controls label { display: flex; align-items: center; gap: 4px; }
+    #controls input[type="range"] { width: 100px; }
+    #info { position: fixed; bottom: 12px; left: 12px; z-index: 10; color: rgba(0,0,0,0.5); font-size: 13px; background: rgba(255,255,255,0.8); padding: 6px 10px; border-radius: 4px; }
+  </style>
+</head>
+<body>
+  <div id="controls">
+    <span style="font-weight:600;margin-right:6px">Germany</span>
+    <button id="reload">↻ Reload</button>
+    <label>Target opacity <input id="opacitySlider" type="range" min="0" max="1" step="0.05" value="0.4"></label>
+  </div>
+  <div id="info">🖱 Drag to orbit • Scroll to zoom • Right-drag to pan</div>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+
+  <script type="module">
+    import * as THREE from 'three'
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
+    import { FontLoader } from 'three/addons/loaders/FontLoader.js'
+    import { TextGeometry } from 'three/addons/geometries/TextGeometry.js'
+
+    // ---- data ----
+    const ringMat = new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide, transparent: true, opacity: 0.75 })
+    const aRingMat = new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide, transparent: true, opacity: 0.75 })
+    const demoLineColor = 0xffea00
+    const autoLineColor = 0xEA00FF
+
+    const rings = [
+      { inner: 0.10, outer: 0.15, material: ringMat, end: 120 },
+      { inner: 0.50, outer: 0.55, material: ringMat, end: 160 },
+      { inner: 0.80, outer: 0.90, material: aRingMat, end: 200 },
+      { inner: 1.10, outer: 1.20, material: ringMat, end: 240 },
+    ]
+
+    const textEntries = [
+      { year: '1918_Weimar Republic founded', text: 'After WWI and the November Revolution, the Weimar Constitution establishes a parliamentary democracy with universal suffrage and civil rights.\nA period of political instability, economic crisis, and cultural flowering.', y: 0.10 },
+      { year: '1933_Nazi seizure of power', text: 'Hitler appointed Chancellor. The Reichstag Fire Decree and Enabling Act dismantle democratic institutions.\nOne-party dictatorship, suppression of opposition, and systematic persecution begin.', y: 0.50 },
+      { year: '1949_FRG and GDR founded', text: 'Post-WWII division leads to two German states: the democratic Federal Republic (West) and the Soviet-dominated German Democratic Republic (East).\nWest Germany adopts Basic Law with strong democratic safeguards.', y: 0.85 },
+      { year: '1990_German reunification', text: 'Peaceful revolution in East Germany (1989) leads to the fall of the Berlin Wall.\nThe Unification Treaty restores a single democratic German state under the Basic Law.', y: 1.12 },
+    ]
+
+    // ---- scene ----
+    const scene = new THREE.Scene()
+    scene.background = new THREE.Color(0xf0f0f0)
+
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 50)
+    camera.position.set(0, 1, 0)
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true })
+    renderer.setSize(window.innerWidth, window.innerHeight)
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+    document.body.appendChild(renderer.domElement)
+
+    const controls = new OrbitControls(camera, renderer.domElement)
+    controls.target.set(0, 0.46, 0)
+    controls.update()
+    controls.enableDamping = true
+
+    // ---- target image plane ----
+    const targetGroup = new THREE.Group()
+
+    const img = new Image()
+    img.crossOrigin = 'anonymous'
+    img.src = './image-targets/germany_original.png'
+    const texture = new THREE.Texture(img)
+    img.onload = () => { texture.needsUpdate = true }
+    texture.colorSpace = THREE.SRGBColorSpace
+
+    const imgAspect = 686 / 861
+    const planeGeo = new THREE.PlaneGeometry(imgAspect * 0.8, 0.8)
+    const planeMat = new THREE.MeshBasicMaterial({ map: texture, transparent: true, opacity: 0.4, depthWrite: false })
+    const plane = new THREE.Mesh(planeGeo, planeMat)
+    plane.rotation.x = 0
+    plane.position.y = 0.45
+    plane.position.z = -0.01
+  
+    targetGroup.add(plane)
+
+    // grid helper
+    const grid = new THREE.GridHelper(2, 20, 0xcccccc, 0xdddddd)
+    grid.position.y = 0.46
+
+    targetGroup.add(grid)
+
+    scene.add(targetGroup)
+
+    // ---- rings + text ----
+    const animGroup = new THREE.Group()
+    animGroup.position.y = 0.46
+    scene.add(animGroup)
+
+    const targetLength = -Math.PI / 2
+
+    function easeInOutQuad(t) {
+      return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t
+    }
+
+    function getLength(frame, end) {
+      return targetLength * easeInOutQuad(Math.min(frame / end, 1))
+    }
+
+    function createRingGeometry(inner, outer, length) {
+      const sweep = length === 0 ? 0.001 : length
+      return new THREE.RingGeometry(inner, outer, 64, 1, Math.PI, sweep)
+    }
+
+    function mixColorHex(hex, amount) {
+      const r = (hex >> 16) & 0xff, g = (hex >> 8) & 0xff, b = hex & 0xff
+      return (Math.round(255 + (r - 255) * amount) << 16) | (Math.round(255 + (g - 255) * amount) << 8) | Math.round(255 + (b - 255) * amount)
+    }
+
+    const lineThickness = 0.008
+    const lineCylGeo = new THREE.CylinderGeometry(lineThickness, lineThickness, 1, 4, 1)
+
+    let ringMeshes = []
+    let prevRingLen = []
+    let textGroups = []
+
+    const SCALE = 0.13
+
+    function buildScene() {
+      // clear
+      ringMeshes.forEach(m => animGroup.remove(m))
+      textGroups.forEach(g => animGroup.remove(g))
+      ringMeshes = []
+      prevRingLen = []
+      textGroups = []
+
+      animGroup.scale.set(SCALE, SCALE, SCALE)
+
+      // rings
+      rings.forEach((ring, ri) => {
+        const geo = createRingGeometry(ring.inner, ring.outer, 0)
+        const mesh = new THREE.Mesh(geo, ring.material)
+        mesh.rotation.x = -Math.PI / 2
+        mesh.position.y = 0
+        animGroup.add(mesh)
+        ringMeshes.push(mesh)
+        prevRingLen.push(0)
+      })
+
+      // text entries
+      textEntries.forEach((entry, ti) => {
+        const group = new THREE.Group()
+        const yPos = entry.y
+
+        // dot
+        const dotGeo = new THREE.SphereGeometry(0.02, 8, 8)
+        const dotMat = new THREE.MeshBasicMaterial({ color: 0x333333 })
+        const dot = new THREE.Mesh(dotGeo, dotMat)
+        dot.position.set(0, 0, 0)
+        group.add(dot)
+
+        // year label
+        const yearStr = entry.year.split('_')[0]
+        const canvas = document.createElement('canvas')
+        const ctx = canvas.getContext('2d')
+        canvas.width = 1024
+        canvas.height = 160
+        ctx.fillStyle = '#000'
+        ctx.font = '64px Newsreader'
+        ctx.textBaseline = 'top'
+        ctx.fillText(yearStr, 20, 20)
+
+        const yearTex = new THREE.CanvasTexture(canvas)
+        yearTex.colorSpace = THREE.SRGBColorSpace
+        const yearMat = new THREE.SpriteMaterial({ map: yearTex, transparent: true, depthTest: false })
+        const yearSprite = new THREE.Sprite(yearMat)
+        yearSprite.position.set(0.15, 0.0, 0)
+        yearSprite.scale.set(0.6, 0.095, 1)
+        group.add(yearSprite)
+
+        group.position.y = yPos
+        animGroup.add(group)
+        textGroups.push(group)
+      })
+    }
+
+    // ---- animation loop ----
+    let frame = 0
+
+    function animate() {
+      requestAnimationFrame(animate)
+      controls.update()
+
+      animGroup.scale.set(SCALE, SCALE, SCALE)
+
+      // animate rings
+      ringMeshes.forEach((mesh, ri) => {
+        const ring = rings[ri]
+        const len = getLength(frame, ring.end)
+        if (len !== prevRingLen[ri]) {
+          const newGeo = createRingGeometry(ring.inner, ring.outer, len)
+          mesh.geometry.dispose()
+          mesh.geometry = newGeo
+          prevRingLen[ri] = len
+        }
+      })
+
+      // animate text
+      textGroups.forEach((group, ti) => {
+        const entry = textEntries[ti]
+        const startFrame = 60
+        const duration = 60
+        const f = Math.max(0, Math.min((frame - startFrame) / duration, 1))
+        const t = 1 - Math.pow(1 - f, 2)
+        const startPos = new THREE.Vector3(-0.5, entry.y, 0)
+        const endPos = new THREE.Vector3(0.15, entry.y, 0)
+        group.position.lerpVectors(startPos, endPos, t)
+        group.visible = frame >= startFrame
+      })
+
+      frame++
+      renderer.render(scene, camera)
+    }
+
+    // ---- UI ----
+    document.getElementById('reload').addEventListener('click', () => {
+      frame = 0
+      buildScene()
+    })
+    document.getElementById('opacitySlider').addEventListener('input', (e) => {
+      plane.material.opacity = parseFloat(e.target.value)
+    })
+
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight
+      camera.updateProjectionMatrix()
+      renderer.setSize(window.innerWidth, window.innerHeight)
+    })
+
+    // ---- start ----
+    document.fonts.load('400 64px Newsreader').then(() => {
+      buildScene()
+      animate()
+    })
+  </script>
+<!-- Code injected by live-server -->
+<script>
+	// <![CDATA[  <-- For SVG support
+	if ('WebSocket' in window) {
+		(function () {
+			function refreshCSS() {
+				var sheets = [].slice.call(document.getElementsByTagName("link"));
+				var head = document.getElementsByTagName("head")[0];
+				for (var i = 0; i < sheets.length; ++i) {
+					var elem = sheets[i];
+					var parent = elem.parentElement || head;
+					parent.removeChild(elem);
+					var rel = elem.rel;
+					if (elem.href && typeof rel != "string" || rel.length == 0 || rel.toLowerCase() == "stylesheet") {
+						var url = elem.href.replace(/(&|\?)_cacheOverride=\d+/, '');
+						elem.href = url + (url.indexOf('?') >= 0 ? '&' : '?') + '_cacheOverride=' + (new Date().valueOf());
+					}
+					parent.appendChild(elem);
+				}
+			}
+			var protocol = window.location.protocol === 'http:' ? 'ws://' : 'wss://';
+			var address = protocol + window.location.host + window.location.pathname + '/ws';
+			var socket = new WebSocket(address);
+			socket.onmessage = function (msg) {
+				if (msg.data == 'reload') window.location.reload();
+				else if (msg.data == 'refreshcss') refreshCSS();
+			};
+			if (sessionStorage && !sessionStorage.getItem('IsThisFirstTime_Log_From_LiveServer')) {
+				console.log('Live reload enabled.');
+				sessionStorage.setItem('IsThisFirstTime_Log_From_LiveServer', true);
+			}
+		})();
+	}
+	else {
+		console.error('Upgrade your browser. This Browser is NOT supported WebSocket for Live-Reloading.');
+	}
+	// ]]>
+</script>
+
+
+<canvas data-engine="three.js r160" width="1405" height="1334" style="display: block; width: 1405px; height: 1334px; touch-action: none;"></canvas></body></html>

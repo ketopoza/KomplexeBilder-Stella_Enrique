@@ -1,0 +1,23 @@
+{
+  "imagePath": "image-targets/RusiaPrueba_luminance.png",
+  "metadata": null,
+  "name": "RusiaPrueba",
+  "type": "PLANAR",
+  "properties": {
+    "left": 138,
+    "top": 0,
+    "width": 829,
+    "height": 1105,
+    "isRotated": true,
+    "originalWidth": 1105,
+    "originalHeight": 1105
+  },
+  "resources": {
+    "originalImage": "RusiaPrueba_original.png",
+    "croppedImage": "RusiaPrueba_cropped.png",
+    "thumbnailImage": "RusiaPrueba_thumbnail.png",
+    "luminanceImage": "RusiaPrueba_luminance.png"
+  },
+  "created": 1783696363090,
+  "updated": 1783696363090
+}
