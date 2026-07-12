@@ -50,9 +50,24 @@
       background: rgba(0,0,0,0.5);
       backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
       font-family: 'Newsreader', serif;
-      opacity: 0; transition: opacity 0.5s ease;
+      opacity: 0;
     }
-    #info-overlay.show { opacity: 1; }
+    #info-overlay.show { opacity: 1; transition: opacity 0.5s ease; }
+    #info-overlay.burbuja-open {
+      animation: burbujaExpand 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+    #info-overlay.burbuja-close {
+      animation: burbujaShrink 0.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+    @keyframes burbujaExpand {
+      from { transform: scale(0); transform-origin: left bottom; opacity: 0; }
+      50% { opacity: 1; }
+      to { transform: scale(1); transform-origin: left bottom; opacity: 1; }
+    }
+    @keyframes burbujaShrink {
+      from { transform: scale(1); transform-origin: left bottom; opacity: 1; }
+      to { transform: scale(0); transform-origin: left bottom; opacity: 0; }
+    }
     #info-overlay .card {
       background: #fff; width: 100%; height: 100%;
       padding: 40px 32px 0 32px; box-sizing: border-box;
@@ -122,9 +137,9 @@
     /* contact overlay */
     #close-burbuja {
       position: fixed; top: 12px; right: 12px; z-index: 260;
-      width: 36px; height: 36px; border-radius: 50%;
-      background: rgba(0,0,0,0.1); border: none;
-      color: #000; font-size: 18px; line-height: 1;
+      width: 40px; height: 40px; border-radius: 50%;
+      background: rgba(0,0,0,0.55); border: none;
+      color: #fff; font-size: 20px; line-height: 1;
       display: flex; align-items: center; justify-content: center;
       cursor: pointer;
     }
@@ -820,48 +835,59 @@ There, he crafts based on his interests: the city, data and politics. Based on a
 
     // 🎥 hides overlay, shows info button
     document.querySelector('.start-btn').addEventListener('click', function() {
+      overlayEl.classList.remove('show', 'burbuja-open', 'burbuja-close')
       overlayEl.style.display = 'none'
       infoBtn.style.display = 'flex'
     })
     document.querySelector('.start-btn').addEventListener('touchend', function(e) {
       e.preventDefault()
+      overlayEl.classList.remove('show', 'burbuja-open', 'burbuja-close')
       overlayEl.style.display = 'none'
       infoBtn.style.display = 'flex'
     })
 
-    // ⁉️ opens overlay in info mode
+    // ⁉️ opens overlay — expand animation
     infoBtn.addEventListener('click', function() {
+      overlayEl.classList.remove('show', 'burbuja-close')
       overlayEl.style.display = ''
       infoBtn.style.display = 'none'
+      overlayEl.classList.add('burbuja-open')
       goToModeSlide('info', 0)
     })
     infoBtn.addEventListener('touchend', function(e) {
       e.preventDefault()
+      overlayEl.classList.remove('show', 'burbuja-close')
       overlayEl.style.display = ''
       infoBtn.style.display = 'none'
+      overlayEl.classList.add('burbuja-open')
       goToModeSlide('info', 0)
     })
 
-    // ✕ close button: hide overlay, show burbuja
-    document.getElementById('close-burbuja').addEventListener('click', function() {
-      overlayEl.style.display = 'none'
-      infoBtn.style.display = 'flex'
-    })
-    document.getElementById('close-burbuja').addEventListener('touchend', function(e) {
-      e.preventDefault()
-      overlayEl.style.display = 'none'
-      infoBtn.style.display = 'flex'
-    })
+    // ✕ close button: shrink animation, then hide
+    var closeBurbuja = document.getElementById('close-burbuja')
+    function closeBurbujaFn() {
+      overlayEl.classList.add('burbuja-close')
+      setTimeout(function() {
+        overlayEl.style.display = 'none'
+        overlayEl.classList.remove('burbuja-open', 'burbuja-close')
+        infoBtn.style.display = 'flex'
+      }, 380)
+    }
+    closeBurbuja.addEventListener('click', closeBurbujaFn)
+    closeBurbuja.addEventListener('touchend', function(e) { e.preventDefault(); closeBurbujaFn() })
 
     // H1: toggle
     var h1 = document.getElementById('page-h1')
     function handleH1() {
       if (overlayEl.style.display === 'none') {
+        overlayEl.classList.remove('burbuja-open', 'burbuja-close')
         overlayEl.style.display = ''
+        overlayEl.classList.add('show')
         infoBtn.style.display = 'none'
         goToModeSlide('initial', 0)
       } else {
         if (currentMode === 'initial' && currentModeSlide === 0) {
+          overlayEl.classList.remove('show', 'burbuja-open', 'burbuja-close')
           overlayEl.style.display = 'none'
           infoBtn.style.display = 'flex'
         } else {
