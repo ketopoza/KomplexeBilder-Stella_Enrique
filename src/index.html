@@ -115,6 +115,24 @@
       font-size: 0;
     }
 
+    #close-burbuja {
+      position: fixed; top: 12px; right: 12px; z-index: 260;
+      width: 36px; height: 36px; border-radius: 50%;
+      background: rgba(0,0,0,0.1); border: none;
+      color: #000; font-size: 18px; line-height: 1;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+    }
+    #info-btn {
+      position: fixed; bottom: 60px; left: 20px; z-index: 250;
+      width: 44px; height: 44px; border-radius: 50%;
+      background: #fff; color: #000;
+      display: none; align-items: center; justify-content: center;
+      font-size: 20px; cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      -webkit-tap-highlight-color: transparent;
+    }
+
     /* contact overlay */
     #contact-overlay {
       position: fixed; top: 0; left: 0; right: 0; bottom: 0;
@@ -199,18 +217,39 @@
             </div>
             <button class="start-btn">🎥</button>
           </div>
+
+          <!-- info slide 1 -->
+          <div class="slide" data-index="3">
+            <h2>Notes</h2>
+            <div class="text-box">
+            </div>
+          </div>
+
+          <!-- info slide 2 -->
+          <div class="slide" data-index="4">
+            <h2>Sources</h2>
+            <div class="text-box">
+            </div>
+          </div>
+
+          <!-- info slide 3 -->
+          <div class="slide" data-index="5">
+            <h2>Colophon</h2>
+            <div class="text-box">
+            </div>
+          </div>
         </div>
       </div>
+      <button id="close-burbuja">✕</button>
 
     </div>
     <div id="dots-nav">
-      <div class="dot active" data-index="0"></div>
-      <div class="dot" data-index="1"></div>
-      <div class="dot" data-index="2"></div>
     </div>
 
     </div>
   </div>
+
+  <div id="info-btn">⁉️</div>
 
   <div id="contact-overlay">
     <div class="contact-card">
@@ -227,58 +266,108 @@
 
   <script src="bundle-turkey.js"></script>
   <script>
-    // slide navigation
+    // slide navigation — two modes
     const slides = document.querySelectorAll('.slide')
-    const dots = document.querySelectorAll('.dot')
+    const dotsNav = document.getElementById('dots-nav')
     const track = document.querySelector('.slides-track')
     const overlayEl = document.getElementById('info-overlay')
+    const infoBtn = document.getElementById('info-btn')
 
-    let currentSlide = 0
+    const modes = {
+      initial: { start: 0, count: 3 },
+      info: { start: 3, count: 3 }
+    }
+    let currentMode = 'initial'
+    let currentModeSlide = 0
 
-    // number the dots
-    dots.forEach((d, i) => { d.textContent = String(i + 1) })
-
-    function goToSlide(index) {
-      currentSlide = index
-      track.style.transform = `translateX(-${index * 100}%)`
-      dots.forEach(d => d.classList.remove('active'))
-      dots[index].classList.add('active')
+    function getActualIndex(mode, modeSlide) {
+      return modes[mode].start + modeSlide
     }
 
-    // swipe gesture (only navigation — dots are visual indicators)
+    function goToModeSlide(mode, index) {
+      currentMode = mode
+      currentModeSlide = index
+      const actual = getActualIndex(mode, index)
+      track.style.transform = 'translateX(-' + (actual * 100) + '%)'
+      dotsNav.innerHTML = ''
+      for (var i = 0; i < modes[mode].count; i++) {
+        var dot = document.createElement('div')
+        dot.className = 'dot' + (i === index ? ' active' : '')
+        dotsNav.appendChild(dot)
+      }
+    }
+
+    // swipe
     const wrapper = document.querySelector('.slides-wrapper')
-    let swipeStartX = 0
-    wrapper.addEventListener('touchstart', (e) => { swipeStartX = e.touches[0].clientX }, { passive: true })
-    wrapper.addEventListener('touchend', (e) => {
-      const dx = e.changedTouches[0].clientX - swipeStartX
-      const cur = currentSlide
+    var swipeStartX = 0
+    wrapper.addEventListener('touchstart', function(e) { swipeStartX = e.touches[0].clientX }, { passive: true })
+    wrapper.addEventListener('touchend', function(e) {
+      var dx = e.changedTouches[0].clientX - swipeStartX
+      var modeInfo = modes[currentMode]
+      var actual = getActualIndex(currentMode, currentModeSlide)
       if (Math.abs(dx) > 40) {
-        const next = dx < 0 ? Math.min(cur + 1, slides.length - 1) : Math.max(cur - 1, 0)
-        if (next !== cur) goToSlide(next)
+        var nextActual = dx < 0
+          ? Math.min(actual + 1, modeInfo.start + modeInfo.count - 1)
+          : Math.max(actual - 1, modeInfo.start)
+        if (nextActual !== actual) {
+          goToModeSlide(currentMode, nextActual - modeInfo.start)
+        }
       }
     }, { passive: true })
 
-    // start button hides overlay
-    const hideOverlay = () => { overlayEl.style.display = 'none' }
-    document.querySelector('.start-btn').addEventListener('click', hideOverlay)
-    document.querySelector('.start-btn').addEventListener('touchend', (e) => { e.preventDefault(); hideOverlay() })
+    // 🎥 hides overlay, shows info button
+    document.querySelector('.start-btn').addEventListener('click', function() {
+      overlayEl.style.display = 'none'
+      infoBtn.style.display = 'flex'
+    })
+    document.querySelector('.start-btn').addEventListener('touchend', function(e) {
+      e.preventDefault()
+      overlayEl.style.display = 'none'
+      infoBtn.style.display = 'flex'
+    })
 
-    // H1: on slide 1 go to scanner, otherwise go to slide 1
-    const h1 = document.getElementById('page-h1')
-    const handleH1 = () => {
+    // ⁉️ opens overlay in info mode
+    infoBtn.addEventListener('click', function() {
+      overlayEl.style.display = ''
+      infoBtn.style.display = 'none'
+      goToModeSlide('info', 0)
+    })
+    infoBtn.addEventListener('touchend', function(e) {
+      e.preventDefault()
+      overlayEl.style.display = ''
+      infoBtn.style.display = 'none'
+      goToModeSlide('info', 0)
+    })
+
+    // ✕ close button: hide overlay, show burbuja
+    document.getElementById('close-burbuja').addEventListener('click', function() {
+      overlayEl.style.display = 'none'
+      infoBtn.style.display = 'flex'
+    })
+    document.getElementById('close-burbuja').addEventListener('touchend', function(e) {
+      e.preventDefault()
+      overlayEl.style.display = 'none'
+      infoBtn.style.display = 'flex'
+    })
+
+    // H1: toggle
+    var h1 = document.getElementById('page-h1')
+    function handleH1() {
       if (overlayEl.style.display === 'none') {
         overlayEl.style.display = ''
-        goToSlide(0)
+        infoBtn.style.display = 'none'
+        goToModeSlide('initial', 0)
       } else {
-        if (currentSlide === 0) {
-          hideOverlay()
+        if (currentMode === 'initial' && currentModeSlide === 0) {
+          overlayEl.style.display = 'none'
+          infoBtn.style.display = 'flex'
         } else {
-          goToSlide(0)
+          goToModeSlide('initial', 0)
         }
       }
     }
     h1.addEventListener('click', handleH1)
-    h1.addEventListener('touchend', (e) => { e.preventDefault(); handleH1() })
+    h1.addEventListener('touchend', function(e) { e.preventDefault(); handleH1() })
 
     // contact overlay (H3)
     const contactOverlay = document.getElementById('contact-overlay')
@@ -338,6 +427,8 @@
     }
     document.addEventListener('click', startLoadingAnim, { once: true })
     document.addEventListener('touchend', startLoadingAnim, { once: true })
+
+    goToModeSlide('initial', 0)
   </script>
 
   <a-scene xrextras-gesture-detector landing-page xrextras-loading xrextras-runtime-error
