@@ -60,16 +60,15 @@
       display: flex; flex-direction: column;
     }
     #info-overlay .slides-wrapper {
-      flex: 1; position: relative; overflow: hidden;
+      flex: 1; overflow: hidden; position: relative;
+    }
+    #info-overlay .slides-track {
+      display: flex; height: 100%;
+      transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     }
     #info-overlay .slide {
-      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-      display: flex; flex-direction: column; justify-content: center;
-      opacity: 0; pointer-events: none; transition: opacity 0.3s;
+      min-width: 100%; display: flex; flex-direction: column; justify-content: center;
       padding: 0 0 20px 0; box-sizing: border-box;
-    }
-    #info-overlay .slide.active {
-      opacity: 1; pointer-events: auto;
     }
     #info-overlay .slide h2 {
       font-size: 18px; font-weight: 400; margin: 0 0 12px 0; text-align: left;
@@ -86,24 +85,27 @@
       padding: 0; background: #fff; border-radius: 0; color: rgba(0,0,0,0.65);
     }
     #info-overlay .start-btn {
-      background: #fff; border: 1px solid #000; border-radius: 0;
-      padding: 6px 20px; cursor: pointer; margin-top: 40px;
+      background: #fff; border: none; border-radius: 0;
+      padding: 0; cursor: pointer; margin-top: 20px;
       display: inline-flex; align-items: center; justify-content: center;
-      align-self: center;
+      align-self: center; font-size: 40px; line-height: 1;
     }
-    .start-btn img { width: 90px; height: auto; display: block; }
     #dots-nav {
-      display: flex; justify-content: center; gap: 10px;
-      padding: 16px 0 32px 0;
+      position: fixed; bottom: 48px; left: 0; width: 100%; z-index: 250;
+      display: flex; justify-content: center; gap: 12px;
+      pointer-events: none;
     }
     #dots-nav .dot {
-      width: 8px; height: 8px; border-radius: 50%;
-      background: rgba(0,0,0,0.2);
-      transition: all 0.3s;
+      width: 10px; height: 10px; border-radius: 50%;
+      background: rgba(0,0,0,0.35);
+      transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0; color: transparent;
     }
     #dots-nav .dot.active {
-      background: rgba(0,0,0,0.8);
-      width: 10px; height: 10px;
+      background: #000;
+      width: 14px; height: 14px; border-radius: 50%;
+      font-size: 0;
     }
     #country-selector {
       position: fixed; top: 60px; left: 50%; transform: translateX(-50%);
@@ -133,7 +135,7 @@
     #contact-overlay .contact-card {
       background: #fff; width: 100%; padding: 20px 32px; box-sizing: border-box;
       transform: translateY(100%); transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
-      border-radius: 20px 20px 0 0;
+      border-radius: 0;
     }
     #contact-overlay.show .contact-card {
       transform: translateY(0);
@@ -177,47 +179,40 @@
     <div class="card">
 
       <div class="slides-wrapper">
-        <!-- slide 1 -->
-        <div class="slide active" data-index="0">
-          <h2>About</h2>
-          <div class="text-box">
-            In the framework of the collaboration between the UdK and the WZB Berlin Social Science Center, we joined the research team “Waves of Regime Transformation” under the direction of Dr. Vanessa Boese-Schlosser.
-            The following visualisations are based on a tree-ring diagram, in which each ring represents the yearly value of democracy according to the ERT V-Dem dataset (see About the Data). 
-            This allows us to trace patterns in regime transformation, showing the eatterns of democratisation and autocratisation spanning from 1900 to 2025.
+        <div class="slides-track">
+          <!-- slide 1 -->
+          <div class="slide" data-index="0">
+            <h2>About</h2>
+            <div class="text-box">
+              In the framework of the collaboration between the UdK and the WZB Berlin Social Science Center, we joined the research team “Waves of Regime Transformation” under the direction of Dr. Vanessa Boese-Schlosser.<br><br>The following visualisations are based on a tree-ring diagram, in which each ring represents the yearly value of democracy according to the ERT V-Dem dataset (see About the Data). This allows us to trace patterns in regime transformation, showing the waves of democratisation and autocratisation spanning from 1900 to 2025.
+            </div>
           </div>
-          <hr>
 
-        </div>
-
-        <!-- slide 2 -->
-        <div class="slide" data-index="1">
-          <h2>About the Data</h2>
-          <div class="text-box">
-            Each ring’s value is calculated from the V-Dem Electoral Democracy Index (v2x_polyarchy), which assigns every country a score between 0 and 1 for each year, where 0 denotes a closed autocracy, characterised by the absence of free elections, political freedoms, and meaningful suffrage, and 1 denotes a full electoral democracy.
-            
-            To capture sustained periods of change, we draw on the Episodes of Regime Transformation (ERT) dataset. Rather than reading the EDI year by year, the ERT dataset identifies distinct episodes of democratisation (liberalising autocracy, democratic deepening) and autocratisation (democratic regression, autocratic regression) within the V-Dem data, flagged through the dem_ep and aut_ep episode variables. It is this episodic view that allows each ring to speak not only to a single year’s value, but to the larger pattern of transformation it belongs to.
+          <!-- slide 2 -->
+          <div class="slide" data-index="1">
+            <h2>About the Data</h2>
+            <div class="text-box">
+               Each ring's value is calculated from the V-Dem Electoral Democracy Index (v2x_polyarchy), which assigns every country a score between 0 and 1 for each year, where 0 denotes a closed autocracy, characterised by the absence of free elections, political freedoms, and meaningful suffrage, and 1 denotes a full electoral democracy.<br><br>To capture sustained periods of change, we draw on the Episodes of Regime Transformation (ERT) dataset. Rather than reading the EDI year by year, the ERT dataset identifies distinct episodes of democratisation (liberalising autocracy, democratic deepening) and autocratisation (democratic regression, autocratic regression) within the V-Dem data, flagged through the dem_ep and aut_ep episode variables. It is this episodic view that allows each ring to speak not only to a single year's value, but to the larger pattern of transformation it belongs to.
+            </div>
           </div>
-        </div>
 
-        <!-- slide 3 -->
-        <div class="slide" data-index="2">
-          <h2>About the Graphic</h2>
-          <div class="text-box">
-            Reading from the centre outward, like tree rings, each diagram traces a country’s democratic history from 1900 to 2025. The thickness of each ring’s line reflects its Electoral Democracy Index (v2x_polyarchy). Thick lines correspond to values closer to 0, marking periods of autocracy, while thin lines correspond to values closer to 1, marking periods of democracy. Whether the line is wavy or straight traces the Episodes of Regime Transformation identified by the ERT dataset (dem_ep and aut_ep), each undulating line marking a sustained episode of democratisation or autocratisation, so that the overall pattern of the ring visualises the country’s trajectory of regime transformation over time. 
-
-            The countries appear in alphabetical order, allowing for easy navigation while avoiding any implied ranking or hierarchy between them.
+          <!-- slide 3 -->
+          <div class="slide" data-index="2">
+            <h2>About the Graphic</h2>
+            <div class="text-box">
+              Reading from the centre outward, like tree rings, each diagram traces a country's democratic history from 1900 to 2025. The thickness of each ring's line reflects its Electoral Democracy Index (v2x_polyarchy). Thick lines correspond to values closer to 0, marking periods of autocracy, while thin lines correspond to values closer to 1, marking periods of democracy. Whether the line is wavy or straight traces the Episodes of Regime Transformation identified by the ERT dataset (dem_ep and aut_ep), each undulating line marking a sustained episode of democratisation or autocratisation, so that the overall pattern of the ring visualises the country's trajectory of regime transformation over time.<br><br>The countries appear in alphabetical order, allowing for easy navigation while avoiding any implied ranking or hierarchy between them.
+            </div>
+            <button class="start-btn">🎥</button>
           </div>
-          <button class="start-btn">
-            <img src="./src/assets/trunk.png" alt="Start">
-          </button>
         </div>
       </div>
 
-      <div id="dots-nav">
-        <div class="dot active" data-index="0"></div>
-        <div class="dot" data-index="1"></div>
-        <div class="dot" data-index="2"></div>
-      </div>
+    </div>
+    <div id="dots-nav">
+      <div class="dot active" data-index="0"></div>
+      <div class="dot" data-index="1"></div>
+      <div class="dot" data-index="2"></div>
+    </div>
 
     </div>
   </div>
@@ -740,12 +735,17 @@ There, he crafts based on his interests: the city, data and politics. Based on a
     // slide navigation
     const slides = document.querySelectorAll('.slide')
     const dots = document.querySelectorAll('.dot')
+    const track = document.querySelector('.slides-track')
     const overlayEl = document.getElementById('info-overlay')
 
+    let currentSlide = 0
+
+    dots.forEach((d, i) => { d.textContent = String(i + 1) })
+
     function goToSlide(index) {
-      slides.forEach(s => s.classList.remove('active'))
+      currentSlide = index
+      track.style.transform = `translateX(-${index * 100}%)`
       dots.forEach(d => d.classList.remove('active'))
-      slides[index].classList.add('active')
       dots[index].classList.add('active')
     }
 
@@ -755,7 +755,7 @@ There, he crafts based on his interests: the city, data and politics. Based on a
     wrapper.addEventListener('touchstart', (e) => { swipeStartX = e.touches[0].clientX }, { passive: true })
     wrapper.addEventListener('touchend', (e) => {
       const dx = e.changedTouches[0].clientX - swipeStartX
-      const cur = parseInt(document.querySelector('.slide.active').dataset.index)
+      const cur = currentSlide
       if (Math.abs(dx) > 40) {
         const next = dx < 0 ? Math.min(cur + 1, slides.length - 1) : Math.max(cur - 1, 0)
         if (next !== cur) goToSlide(next)
@@ -774,8 +774,7 @@ There, he crafts based on his interests: the city, data and politics. Based on a
         overlayEl.style.display = ''
         goToSlide(0)
       } else {
-        const cur = parseInt(document.querySelector('.slide.active').dataset.index)
-        if (cur === 0) {
+        if (currentSlide === 0) {
           hideOverlay()
         } else {
           goToSlide(0)
@@ -833,8 +832,10 @@ There, he crafts based on his interests: the city, data and politics. Based on a
       setTimeout(() => {
         ls.classList.add('animate')
         setTimeout(() => {
-          ls.classList.add('done')
           document.getElementById('info-overlay').classList.add('show')
+        }, ANIM.duration - 500)
+        setTimeout(() => {
+          ls.classList.add('done')
           setTimeout(() => { ls.style.display = 'none' }, 50)
         }, ANIM.duration)
       }, ANIM.delay)
