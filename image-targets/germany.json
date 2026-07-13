@@ -4,13 +4,13 @@
   "name": "germany",
   "type": "PLANAR",
   "properties": {
-    "left": 20,
+    "left": 331,
     "top": 0,
-    "width": 646,
-    "height": 861,
-    "isRotated": false,
-    "originalWidth": 686,
-    "originalHeight": 861
+    "width": 2201,
+    "height": 2934,
+    "isRotated": true,
+    "originalWidth": 2862,
+    "originalHeight": 2934
   },
   "resources": {
     "originalImage": "germany_original.png",
@@ -18,6 +18,6 @@
     "thumbnailImage": "germany_thumbnail.png",
     "luminanceImage": "germany_luminance.png"
   },
-  "created": 1783778622624,
-  "updated": 1783778622624
+  "created": 1783962446681,
+  "updated": 1783962446681
 }

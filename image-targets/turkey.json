@@ -4,13 +4,13 @@
   "name": "turkey",
   "type": "PLANAR",
   "properties": {
-    "left": 180,
+    "left": 331,
     "top": 0,
-    "width": 1113,
-    "height": 1484,
+    "width": 2201,
+    "height": 2934,
     "isRotated": true,
-    "originalWidth": 1472,
-    "originalHeight": 1484
+    "originalWidth": 2862,
+    "originalHeight": 2934
   },
   "resources": {
     "originalImage": "turkey_original.png",
@@ -18,6 +18,6 @@
     "thumbnailImage": "turkey_thumbnail.png",
     "luminanceImage": "turkey_luminance.png"
   },
-  "created": 1783536881998,
-  "updated": 1783536881998
+  "created": 1783962440524,
+  "updated": 1783962440524
 }
