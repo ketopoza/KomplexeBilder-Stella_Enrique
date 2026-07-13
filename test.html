@@ -107,20 +107,17 @@
     }
     #dots-nav {
       position: fixed; bottom: 48px; left: 0; width: 100%; z-index: 250;
-      display: flex; justify-content: center; gap: 12px;
+      display: flex; justify-content: center; gap: 8px;
       pointer-events: none;
     }
     #dots-nav .dot {
       width: 10px; height: 10px; border-radius: 50%;
       background: rgba(0,0,0,0.35);
       transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0; color: transparent;
     }
     #dots-nav .dot.active {
       background: #000;
       width: 14px; height: 14px; border-radius: 50%;
-      font-size: 0;
     }
     #country-selector {
       position: fixed; top: 60px; left: 50%; transform: translateX(-50%);
@@ -138,8 +135,8 @@
     #close-burbuja {
       position: fixed; top: 80px; right: 16px; z-index: 310;
       width: 40px; height: 40px; border-radius: 50%;
-      background: rgba(0,0,0,0.55); border: none;
-      color: #fff; font-size: 20px; line-height: 1;
+      background: none; border: none;
+      font-size: 20px; line-height: 1;
       display: flex; align-items: center; justify-content: center;
       cursor: pointer;
     }
@@ -221,37 +218,30 @@
 
           <!-- slide 2 -->
           <div class="slide" data-index="1">
-            <h2>About the Data</h2>
+            <h2>AR Technologies</h2>
             <div class="text-box">
-               Each ring's value is calculated from the V-Dem Electoral Democracy Index (v2x_polyarchy), which assigns every country a score between 0 and 1 for each year, where 0 denotes a closed autocracy, characterised by the absence of free elections, political freedoms, and meaningful suffrage, and 1 denotes a full electoral democracy.<br><br>To capture sustained periods of change, we draw on the Episodes of Regime Transformation (ERT) dataset. Rather than reading the EDI year by year, the ERT dataset identifies distinct episodes of democratisation (liberalising autocracy, democratic deepening) and autocratisation (democratic regression, autocratic regression) within the V-Dem data, flagged through the dem_ep and aut_ep episode variables. It is this episodic view that allows each ring to speak not only to a single year's value, but to the larger pattern of transformation it belongs to.
-            </div>
-          </div>
-
-          <!-- slide 3 -->
-          <div class="slide" data-index="2">
-            <h2>About the Graphic</h2>
-            <div class="text-box">
-              Reading from the centre outward, like tree rings, each diagram traces a country's democratic history from 1900 to 2025. The thickness of each ring's line reflects its Electoral Democracy Index (v2x_polyarchy). Thick lines correspond to values closer to 0, marking periods of autocracy, while thin lines correspond to values closer to 1, marking periods of democracy. Whether the line is wavy or straight traces the Episodes of Regime Transformation identified by the ERT dataset (dem_ep and aut_ep), each undulating line marking a sustained episode of democratisation or autocratisation, so that the overall pattern of the ring visualises the country's trajectory of regime transformation over time.<br><br>The countries appear in alphabetical order, allowing for easy navigation while avoiding any implied ranking or hierarchy between them.
+            Augmented Reality (AR) allows you to view virtual information superimposed onto the real environment via your smartphone's camera. To use it correctly, please check the following checklist: \n  Ensure a good lighting, \nkeep the device steady and focus correctly on the specified surface or marker. \nOnce detected, you can interact with the virtual elements by moving the device or using the controls available in the app. 
             </div>
             <button class="start-btn">🎥</button>
           </div>
 
           <!-- info slide 1 -->
-          <div class="slide" data-index="3">
+          <div class="slide" data-index="2">
             <h2>Notes</h2>
             <div class="text-box">
             </div>
           </div>
 
           <!-- info slide 2 -->
-          <div class="slide" data-index="4">
-            <h2>Sources</h2>
+          <div class="slide" data-index="3">
+            <h2>About the Graphic</h2>
             <div class="text-box">
+              Reading from the centre outward, like tree rings, each diagram traces a country's democratic history from 1900 to 2025. The thickness of each ring's line reflects its Electoral Democracy Index (v2x_polyarchy). Thick lines correspond to values closer to 0, marking periods of autocracy, while thin lines correspond to values closer to 1, marking periods of democracy. Whether the line is wavy or straight traces the Episodes of Regime Transformation identified by the ERT dataset (dem_ep and aut_ep), each undulating line marking a sustained episode of democratisation or autocratisation, so that the overall pattern of the ring visualises the country's trajectory of regime transformation over time.<br><br>The countries appear in alphabetical order, allowing for easy navigation while avoiding any implied ranking or hierarchy between them.
             </div>
           </div>
 
           <!-- info slide 3 -->
-          <div class="slide" data-index="5">
+          <div class="slide" data-index="4">
             <h2>Colophon</h2>
             <div class="text-box">
             </div>
@@ -792,8 +782,8 @@ There, he crafts based on his interests: the city, data and politics. Based on a
     const infoBtn = document.getElementById('info-btn')
 
     const modes = {
-      initial: { start: 0, count: 3 },
-      info: { start: 3, count: 3 }
+      initial: { start: 0, count: 2 },
+      info: { start: 2, count: 3 }
     }
     let currentMode = 'initial'
     let currentModeSlide = 0
