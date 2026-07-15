@@ -14,13 +14,13 @@
   <script src="https://cdn.jsdelivr.net/npm/@8thwall/xrextras@1/dist/xrextras.js" crossorigin="anonymous"></script>
   <style>
     #page-h1 {
-      position: fixed; top: 0; left: 0; width: 100%; text-align: center; z-index: 300;
+      position: fixed; top: 0; left: 0; width: 100%; text-align: center; z-index: 400;
       color: #000; font-family: 'Newsreader', serif;
       font-size: 28px; font-weight: 400;
       cursor: pointer; margin: 0; padding: 20px 10px 0 0; background: #fff;
     }
     #page-h3 {
-      position: fixed; bottom: 0; left: 0; width: 100%; text-align: center; z-index: 300;
+      position: fixed; bottom: 0; left: 0; width: 100%; text-align: center; z-index: 400;
       color: rgba(0,0,0,0.7); font-family: 'Newsreader', serif;
       font-size: 16px; font-weight: 400;
       cursor: pointer; margin: 0; padding: 10px 0px 2px 0px;
@@ -28,7 +28,7 @@
     }
     #loading-screen {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      z-index: 400; background: #fff;
+      z-index: 500; background: #fff;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
       font-family: 'Newsreader', serif;
       transition: opacity 0.5s ease;
@@ -144,6 +144,46 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.2);
       -webkit-tap-highlight-color: transparent;
     }
+    #concentric-btn {
+      position: fixed; bottom: 60px; left: 76px; z-index: 250;
+      width: 44px; height: 44px; border-radius: 50%;
+      background: #fff; color: #000;
+      display: none; align-items: center; justify-content: center;
+      font-size: 20px; cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      -webkit-tap-highlight-color: transparent;
+    }
+    #concentric-overlay {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      z-index: 350; background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+      font-family: 'Newsreader', serif;
+      display: none; align-items: center; justify-content: center;
+    }
+    #concentric-overlay.burbuja-open {
+      display: flex;
+      animation: burbujaExpand 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+    #concentric-overlay.burbuja-close {
+      display: flex;
+      animation: burbujaShrink 0.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+    #concentric-overlay .card {
+      background: #fff; width: 100%; height: 100%;
+      padding: 40px 32px 0 32px; box-sizing: border-box;
+      display: flex;
+    }
+    #concentric-overlay iframe {
+      width: 100%; height: 100%; border: none;
+    }
+    #close-concentric {
+      position: fixed; top: 80px; right: 16px; z-index: 360;
+      width: 40px; height: 40px; border-radius: 50%;
+      background: none; border: none;
+      font-size: 20px; line-height: 1;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: #000;
+    }
 
     /* contact overlay */
     #contact-overlay {
@@ -159,7 +199,7 @@
       opacity: 1; pointer-events: auto;
     }
     #contact-overlay .contact-card {
-      background: #fff; width: 100%; padding: 20px 32px; box-sizing: border-box;
+      background: #fff; width: 100%; padding: 20px 32px 55px; box-sizing: border-box;
       transform: translateY(100%); transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
       border-radius: 0;
     }
@@ -274,6 +314,14 @@
   </div>
 
   <div id="info-btn">⁉️</div>
+  <div id="concentric-btn">🌐</div>
+
+  <div id="concentric-overlay">
+    <div class="card">
+      <iframe src="concentric.html"></iframe>
+    </div>
+    <button id="close-concentric">❌</button>
+  </div>
 
   <div id="contact-overlay">
     <div class="contact-card">
@@ -296,6 +344,9 @@
     const track = document.querySelector('.slides-track')
     const overlayEl = document.getElementById('info-overlay')
     const infoBtn = document.getElementById('info-btn')
+    const concentricBtn = document.getElementById('concentric-btn')
+    const concentricOverlay = document.getElementById('concentric-overlay')
+    const closeConcentric = document.getElementById('close-concentric')
 
     const modes = {
       initial: { start: 0, count: 2 },
@@ -344,12 +395,14 @@
       overlayEl.classList.remove('show', 'burbuja-open', 'burbuja-close')
       overlayEl.style.display = 'none'
       infoBtn.style.display = 'flex'
+      concentricBtn.style.display = 'flex'
     })
     document.querySelector('.start-btn').addEventListener('touchend', function(e) {
       e.preventDefault()
       overlayEl.classList.remove('show', 'burbuja-open', 'burbuja-close')
       overlayEl.style.display = 'none'
       infoBtn.style.display = 'flex'
+      concentricBtn.style.display = 'flex'
     })
 
     // ⁉️ opens overlay — expand animation
@@ -357,6 +410,7 @@
       overlayEl.classList.remove('show', 'burbuja-close')
       overlayEl.style.display = ''
       infoBtn.style.display = 'none'
+      concentricBtn.style.display = 'none'
       overlayEl.classList.add('burbuja-open')
       goToModeSlide('info', 0)
     })
@@ -365,9 +419,32 @@
       overlayEl.classList.remove('show', 'burbuja-close')
       overlayEl.style.display = ''
       infoBtn.style.display = 'none'
+      concentricBtn.style.display = 'none'
       overlayEl.classList.add('burbuja-open')
       goToModeSlide('info', 0)
     })
+
+    // 🌐 concentric overlay
+    function showConcentric() {
+      concentricOverlay.classList.remove('burbuja-close')
+      concentricOverlay.style.display = ''
+      concentricBtn.style.display = 'none'
+      concentricOverlay.classList.add('burbuja-open')
+    }
+    function hideConcentric() {
+      concentricOverlay.classList.add('burbuja-close')
+      concentricOverlay.classList.remove('burbuja-open')
+      setTimeout(function() {
+        concentricOverlay.style.display = 'none'
+        concentricOverlay.classList.remove('burbuja-close')
+        concentricBtn.style.display = 'flex'
+      }, 380)
+    }
+    concentricBtn.addEventListener('click', showConcentric)
+    concentricBtn.addEventListener('touchend', function(e) { e.preventDefault(); showConcentric() })
+    closeConcentric.addEventListener('click', hideConcentric)
+    closeConcentric.addEventListener('touchend', function(e) { e.preventDefault(); hideConcentric() })
+    concentricOverlay.addEventListener('click', function(e) { if (e.target === concentricOverlay) hideConcentric() })
 
     // ✕ close button: shrink animation, then hide
     var closeBurbuja = document.getElementById('close-burbuja')
@@ -377,6 +454,7 @@
         overlayEl.style.display = 'none'
         overlayEl.classList.remove('burbuja-open', 'burbuja-close')
         infoBtn.style.display = 'flex'
+        concentricBtn.style.display = 'flex'
       }, 380)
     }
     closeBurbuja.addEventListener('click', closeBurbujaFn)
@@ -390,12 +468,14 @@
         overlayEl.style.display = ''
         overlayEl.classList.add('show')
         infoBtn.style.display = 'none'
+        concentricBtn.style.display = 'none'
         goToModeSlide('initial', 0)
       } else {
         if (currentMode === 'initial' && currentModeSlide === 0) {
           overlayEl.classList.remove('show', 'burbuja-open', 'burbuja-close')
           overlayEl.style.display = 'none'
           infoBtn.style.display = 'flex'
+          concentricBtn.style.display = 'flex'
         } else {
           goToModeSlide('initial', 0)
         }
