@@ -123,6 +123,16 @@ const config = {
           to: path.join(distPath, 'image-targets'),
           noErrorOnMissing: true,
         },
+        {
+          from: path.join(srcPath, 'concentric.html'),
+          to: distPath,
+          noErrorOnMissing: true,
+        },
+        {
+          from: path.join(rootPath, 'test.html'),
+          to: distPath,
+          noErrorOnMissing: true,
+        },
       ],
     }),
   ],
@@ -144,6 +154,10 @@ const config = {
   mode: 'production',
   context: srcPath,
   devServer: {
+    static: [
+      { directory: rootPath },
+      { directory: srcPath },
+    ],
     open: false,
     compress: true,
     hot: true,
