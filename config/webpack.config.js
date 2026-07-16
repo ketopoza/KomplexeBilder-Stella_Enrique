@@ -60,6 +60,12 @@ const makeDefaultHtmlLoader = () => ({
             type: 'src',
             filter: () => false,
           },
+          {
+            tag: 'iframe',
+            attribute: 'src',
+            type: 'src',
+            filter: () => false,
+          },
           ...ATTRIBUTES_TO_EXPAND.map(attr => ({
             tag: '*',
             attribute: attr,
