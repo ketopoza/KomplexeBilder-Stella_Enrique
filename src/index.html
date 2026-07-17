@@ -257,12 +257,12 @@
           <div class="slide" data-index="1">
             <h2>AR Technologies</h2>
             <div class="text-box">
-            Augmented Reality (AR) allows you to view virtual information superimposed onto the real environment via your smartphone's camera. 
+            Augmented Reality <i>AR</i> allows us to view virtual information superimposed onto the real environment via your smartphone's camera. 
             For the best experience: 
 
-              ·Ensure a good lighting, 
-              ·Keep the device steady and focus correctly on our targets. 
-              ·Once detected, you can interact with the virtual elements clicking, moving and scaling. 
+              _Ensure a good lighting, 
+              _Keep the device steady and focus correctly on our targets. 
+              _Once detected, you can interact with the virtual elements clicking, moving and scaling. 
             </div>
             <button class="start-btn">🎥</button>
           </div>
@@ -271,19 +271,22 @@
           <div class="slide" data-index="2">
             <h2>About the Data</h2>
             <div class="text-box">
-             We use the Episodes of Regime Transformation (ERT) dataset from V-Dem. Each country's democratic performance is measured using the Electoral democracy index, which assigns a value between 0 (Closed Autocracy) and 1 (Liberal Democracy). A score of 0 indicates the absence of free elections and political freedoms, while a score of 1 represents a fully functioning electoral democracy.
-
-              The ERT dataset identifies sustained periods of political change in two directions: democratisation (liberalising autocracy and democratic deepening) and autocratisation (democratic regression and autocratic regression).  This episodic view  allows each ring to speak no only to a single year's value, but to a larger pattern of democratic evolution it belongs to. 
-             </div>
+             Each ring’s value is calculated from the V-Dem Electoral Democracy Index <i>v2x_polyarchy</i>, which assigns every country a score between 0 and 1 for each year, where 0 denotes a closed autocracy and 1 denotes a full electoral democracy. 
+             This score is derived from five components: freedom of association, the fairness and integrity of elections, freedom of expression and the press, whether officeholders attained power through election, and the extent of suffrage. 
+              These five components are combined into a single value for each year, which is what each ring represents.
+              To capture sustained periods of change, we draw on the Episodes of Regime Transformation (ERT) dataset. Rather than reading the EDI year by year, the ERT dataset identifies distinct episodes of democratisation (liberalising autocracy, democratic deepening) and autocratisation (democratic regression, autocratic regression) within the V-Dem data, flagged through the <i>dem_ep</i> and <i>aut_ep</i> episode variables. 
+              It is this episodic view that allows each ring to speak not only to a single year’s value, but to the larger pattern of transformation it belongs to.   
+            </div>
            </div>
 
           <!-- info slide 2 -->
           <div class="slide" data-index="3">
             <h2>About the Graphic</h2>
             <div class="text-box">
-              Read from the centre outward, like the growth rings of a tree, each diagram traces a country's democratic development from 1900 to 2025.
-              The line thickness reflects the Electoral democracy index: thicker lines represent lower scores (closer to 0, autocracy), while thinner lines represent higher scores (closer to 1, democracy).
-              The line shape indicates periods of regime change. Straight segments represent years without a transformation episode, while undulating segments mark sustained episodes of democratisation or autocratisation.     
+              Reading from the centre outwards, like tree rings, each diagram traces a country’s democratic history from 1900 to 2025. 
+              The thickness of each ring’s line reflects its Electoral Democracy Index <i>v2x_polyarchy</i>. Thick lines mark periods of autocracy, while thin lines mark periods of democracy. 
+              
+              Whether the line is wavy or straight traces the Episodes of Regime Transformation identified by the ERT dataset <i>dem_ep</i> and <i> aut_ep</i>, each undulating line marking a sustained episode of democratisation or autocratisation, so that the overall pattern of the ring visualises the country’s trajectory of regime transformation over time. 
             </div>
           </div>
 
@@ -329,10 +332,13 @@
     <div class="contact-card">
       <table class="contact-table">
         <tr><td>Wilke, Stella</td><td>Poza Herranz, Enrique</td></tr>
-        <tr><td>pronouns</td><td>he/they</td></tr>
-        <tr><td>mail</td><td>enrique.ph@hotmail.com</td></tr>
-        <tr><td>social media</td><td>@ketopoza_</td></tr>
-        <tr><td>Institution</td><td>After a double BA in Arts + Design, Enrique (aka Keto Poza) moved to Berlin landing at InfoKlasse.<br>There, he crafts an amalgam based on his interests in the city, data, and politics, with an approach that stretches the boundaries of voyeurism and speculation through science fiction.</td></tr>
+        <tr><td>she/her</td><td>he/they</td></tr>
+        <tr><td>stella.wilke@gmail.com</td><td>enrique.ph@hotmail.com</td></tr>
+        <tr><td>@stella.wlk</td><td>@ketopoza_</td></tr>
+        <tr><td>After a BA in Visual Communication from IED Milan, I moved back to my hometown of Hamburg, where I worked as a graphic designer and art director for several years. 
+                Wanting a change from the industry, I joined the Infoklasse at UdK, where I now get to dig into more complex, research-driven topics.</td>
+          <td>After a double BA in Arts + Design, He moved to Berlin landing at InfoKlasse.
+            <br>Here, he works based on his interests: the city, data, and politics. With an methodology that stretches the boundaries of voyeurism, <i>spectacle</i> and speculation through science fiction.</td></tr>
       </table>
       <button class="close-btn">⬇️</button>
     </div>
