@@ -170,7 +170,7 @@
     }
     #concentric-overlay .card {
       background: #fff; width: 100%; height: 100%;
-      padding: 40px 32px 0 32px; box-sizing: border-box;
+      padding: 40px 0 0 0; box-sizing: border-box;
       display: flex;
     }
     #concentric-overlay iframe {
@@ -248,7 +248,7 @@
           <div class="slide" data-index="0">
             <h2>About</h2>
             <div class="text-box">
-              In the framework of the collaboration between the UdK and the WZB Berlin Social Science Center, we joined the research team “Waves of Regime Transformation” under the direction of Dr. Vanessa Boese-Schlosser.<br><br>The following visualisations are based on a tree-ring diagram, in which each ring represents the yearly value of democracy according to the ERT V-Dem dataset (see About the Data). This allows us to trace patterns in regime transformation, showing the waves of democratisation and autocratisation spanning from 1900 to 2025.
+              In the framework of the collaboration between the UdK and the WZB Berlin Social Science Center, we joined the research team “Waves of Regime Transformation” led by Dr. Vanessa Boese-Schlosser.<br><br>The following visualisations are based on a tree-ring diagram, in which each ring represents the country's democratic score according to the ERT V-Dem dataset (see About the Data). Allowing us to trace patterns in regime transformation, showing the waves of democratisation and autocratisation spanning from 1900 to 2025, reading from center outwards.
             </div>
           
           </div>
@@ -258,10 +258,11 @@
             <h2>AR Technologies</h2>
             <div class="text-box">
             Augmented Reality (AR) allows you to view virtual information superimposed onto the real environment via your smartphone's camera. 
-            To use it correctly, please check the following checklist: 
+            For the best experience: 
+
               ·Ensure a good lighting, 
-              ·keep the device steady and focus correctly on the specified surface or marker. 
-              ·Once detected, you can interact with the virtual elements by moving the device or using the controls available in the app. 
+              ·Keep the device steady and focus correctly on our targets. 
+              ·Once detected, you can interact with the virtual elements clicking, moving and scaling. 
             </div>
             <button class="start-btn">🎥</button>
           </div>
@@ -270,17 +271,19 @@
           <div class="slide" data-index="2">
             <h2>About the Data</h2>
             <div class="text-box">
-              Each ring's value is calculated from the V-Dem Electoral Democracy Index (v2x_polyarchy), which assigns every country a score between 0 and 1 for each year, where 0 denotes a closed autocracy, characterised by the absence of free elections, political freedoms, and meaningful suffrage, and 1 denotes a full electoral democracy.
-              
-              To capture sustained periods of change, we draw on the Episodes of Regime Transformation (ERT) dataset. Rather than reading the EDI year by year, the ERT dataset identifies distinct episodes of democratisation (liberalising autocracy, democratic deepening) and autocratisation (democratic regression, autocratic regression) within the V-Dem data, flagged through the dem_ep and aut_ep episode variables. It is this episodic view that allows each ring to speak not only to a single year's value, but to the larger pattern of transformation it belongs to.
-            </div>
-          </div>
+             We use the Episodes of Regime Transformation (ERT) dataset from V-Dem. Each country's democratic performance is measured using the Electoral democracy index, which assigns a value between 0 (Closed Autocracy) and 1 (Liberal Democracy). A score of 0 indicates the absence of free elections and political freedoms, while a score of 1 represents a fully functioning electoral democracy.
+
+              The ERT dataset identifies sustained periods of political change in two directions: democratisation (liberalising autocracy and democratic deepening) and autocratisation (democratic regression and autocratic regression).  This episodic view  allows each ring to speak no only to a single year's value, but to a larger pattern of democratic evolution it belongs to. 
+             </div>
+           </div>
 
           <!-- info slide 2 -->
           <div class="slide" data-index="3">
             <h2>About the Graphic</h2>
             <div class="text-box">
-              Reading from the centre outward, like tree rings, each diagram traces a country's democratic history from 1900 to 2025. The thickness of each ring's line reflects its Electoral Democracy Index (v2x_polyarchy). Thick lines correspond to values closer to 0, marking periods of autocracy, while thin lines correspond to values closer to 1, marking periods of democracy. Whether the line is wavy or straight traces the Episodes of Regime Transformation identified by the ERT dataset (dem_ep and aut_ep), each undulating line marking a sustained episode of democratisation or autocratisation, so that the overall pattern of the ring visualises the country's trajectory of regime transformation over time.<br><br>The countries appear in alphabetical order, allowing for easy navigation while avoiding any implied ranking or hierarchy between them.
+              Read from the centre outward, like the growth rings of a tree, each diagram traces a country's democratic development from 1900 to 2025.
+              The line thickness reflects the Electoral democracy index: thicker lines represent lower scores (closer to 0, autocracy), while thinner lines represent higher scores (closer to 1, democracy).
+              The line shape indicates periods of regime change. Straight segments represent years without a transformation episode, while undulating segments mark sustained episodes of democratisation or autocratisation.     
             </div>
           </div>
 
@@ -290,7 +293,7 @@
             <div class="text-box">
               Thanks to: 
               <ul>
-                <li>Dr. Vanessa Boese-Schlosser, 
+                <li>Dr. Vanessa Boese-Schlosser, & WAVES team,
                   WZB Berlin Social Science Center</li>
                 <li>Robin Coenen</li>
                 <li>Colleges of UdK</li>
@@ -298,8 +301,7 @@
               Bibliography:
               <ul>
                 <li>V-Dem Institute. 2023. Episodes of Regime Transformation Project.</li>
-                <li>Font on use: Pipupo</li>
-              </ul>
+                <li>Font on use: Newsreader</li>
             </div>
           </div>
         </div>
@@ -349,10 +351,9 @@
     const closeConcentric = document.getElementById('close-concentric')
 
     const modes = {
-      initial: { start: 0, count: 2 },
-      info: { start: 2, count: 3 }
+      main: { start: 0, count: 5 }
     }
-    let currentMode = 'initial'
+    let currentMode = 'main'
     let currentModeSlide = 0
 
     function getActualIndex(mode, modeSlide) {
@@ -412,7 +413,7 @@
       infoBtn.style.display = 'none'
       concentricBtn.style.display = 'none'
       overlayEl.classList.add('burbuja-open')
-      goToModeSlide('info', 0)
+      goToModeSlide('main', 0)
     })
     infoBtn.addEventListener('touchend', function(e) {
       e.preventDefault()
@@ -421,7 +422,7 @@
       infoBtn.style.display = 'none'
       concentricBtn.style.display = 'none'
       overlayEl.classList.add('burbuja-open')
-      goToModeSlide('info', 0)
+      goToModeSlide('main', 0)
     })
 
     // 🌐 concentric overlay
@@ -469,15 +470,15 @@
         overlayEl.classList.add('show')
         infoBtn.style.display = 'none'
         concentricBtn.style.display = 'none'
-        goToModeSlide('initial', 0)
+        goToModeSlide('main', 0)
       } else {
-        if (currentMode === 'initial' && currentModeSlide === 0) {
+        if (currentModeSlide === 0) {
           overlayEl.classList.remove('show', 'burbuja-open', 'burbuja-close')
           overlayEl.style.display = 'none'
           infoBtn.style.display = 'flex'
           concentricBtn.style.display = 'flex'
         } else {
-          goToModeSlide('initial', 0)
+          goToModeSlide('main', 0)
         }
       }
     }
@@ -533,6 +534,7 @@
         ls.classList.add('animate')
         setTimeout(() => {
           document.getElementById('info-overlay').classList.add('show')
+          goToModeSlide('main', 0)
         }, ANIM.duration - 500)
         setTimeout(() => {
           ls.classList.add('done')
@@ -543,7 +545,7 @@
     document.addEventListener('click', startLoadingAnim, { once: true })
     document.addEventListener('touchend', startLoadingAnim, { once: true })
 
-    goToModeSlide('initial', 0)
+    goToModeSlide('main', 0)
   </script>
 
   <a-scene xrextras-gesture-detector landing-page xrextras-loading xrextras-runtime-error
