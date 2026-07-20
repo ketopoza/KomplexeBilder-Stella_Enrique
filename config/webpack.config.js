@@ -83,8 +83,6 @@ const config = {
   },
   entry: {
     turkey: path.join(srcPath, 'app.js'),
-    germany: path.join(srcPath, 'app-germany.js'),
-    // russia: path.join(srcPath, 'app-russia.js'),
   },
   output: {
     filename: 'bundle-[name].js',
@@ -99,19 +97,6 @@ const config = {
       chunks: ['turkey'],
       minify: false,
     }),
-    new HtmlWebpackPlugin({
-      template: path.join(srcPath, 'index-germany.html'),
-      filename: 'index-germany.html',
-      inject: false,
-      chunks: ['germany'],
-      minify: false,
-    }),
-    // new HtmlWebpackPlugin({
-    //   template: path.join(srcPath, 'index-russia.html'),
-    //   filename: 'index-russia.html',
-    //   inject: false,
-    //   chunks: ['russia'],
-    // }),
     new CopyWebpackPlugin({
       patterns: [
         {
