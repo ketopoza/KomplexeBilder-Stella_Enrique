@@ -16,14 +16,16 @@ https://8thwall.org/aframe-image-targets-example/
 
 ## About This Project
 
-This AR project explores complex historical and contemporary imagery through augmented reality experiences. The work presents interactive visual narratives designed to be exhibited in Germany, with contextual information for international visitors.
+This AR project explores complex historical and contemporary imagery through augmented reality experiences. The work presents interactive visual narratives designed to be exhibited in Germany, wit[...]
 
 ### Target Image Selection
 
 Two primary locations were selected as image targets:
 
 - **Turkey** - Selected for its dramatic historical regime changes, which provide rich visual contrast and allow for better visualization of complex political transformations
-- **Germany** - Selected as the primary exhibition location, with consideration for visitor context and accessibility. The content leverages popular historical knowledge (particularly regarding WWII) as an entry point for understanding broader historical complexities
+- **Germany** - Selected as the primary exhibition location, with consideration for visitor context and accessibility. The content leverages popular historical knowledge (particularly regarding WW[...]
+
+![Germany image target](./image-targets/germany_original.png)
 
 ### Development Journey: AR Technology Evolution
 
@@ -32,7 +34,7 @@ The project underwent several technological iterations before achieving the fina
 1. **Blender (Initial Drafts)** - Started with 3D modeling and animation in Blender, but this approach did not translate effectively to the AR environment
 2. **ARjs** - Attempted AR.js implementation, but encountered persistent jittering issues that compromised the visual experience
 3. **MindAR** - Explored MindAR as an alternative, but continued to experience similar motion tracking problems
-4. **8th Wall & Three.js (Final Solution)** - Successfully implemented using 8th Wall with Three.js, creating a stable motion graphics interactive system that forms the foundation for the current experience
+4. **8th Wall & Three.js (Final Solution)** - Successfully implemented using 8th Wall with Three.js, creating a stable motion graphics interactive system that forms the foundation for the current expe[...]
 
 ### Interactive Content Structure
 
