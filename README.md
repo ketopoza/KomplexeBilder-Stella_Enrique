@@ -52,5 +52,5 @@ Each episode features:
 Open with your phone the link on the 'About' section on this Git directory.
 Give the permission to access to the phone camera. 
 Scan the target : ![Germany image target](./image-targets/turkey_original.png)  
-## We need to edit the pics to make them more clean this, maybe take out the glass? ##
+## We need to edit the pics to make them more clean this, maybe take out the glass? Rotate -90 degrees##
 Touch on the boxes to get more info abour each time period. 
