@@ -1,6 +1,6 @@
 # A-Frame: Image Targets
 
-This example uses image targets to display information about jellyfish on a flyer. It uses the xrextras-named-image-target component to connect an <a-entity> to an image target by name while the xrextras-play-video component enables video playback.
+This example uses image targets to display information about jellyfish on a flyer. It uses the xrextras-named-image-target component to connect an <a-entity> to an image target by name while the xr[...]
 
 ![Preview of the experience showing a printed flyer with a 3D jellyfish and playable video aligned to the graphics](./src/assets/screenshot-flyer.jpg)
 
@@ -13,6 +13,33 @@ https://8thwall.org/aframe-image-targets-example/
 ![Flyer design showing image targets](./src/assets/flyer.jpg)
 
 </details>
+
+## About This Project
+
+This AR project explores complex historical and contemporary imagery through augmented reality experiences. The work presents interactive visual narratives designed to be exhibited in Germany, with contextual information for international visitors.
+
+### Target Image Selection
+
+Two primary locations were selected as image targets:
+
+- **Turkey** - Selected for its dramatic historical regime changes, which provide rich visual contrast and allow for better visualization of complex political transformations
+- **Germany** - Selected as the primary exhibition location, with consideration for visitor context and accessibility. The content leverages popular historical knowledge (particularly regarding WWII) as an entry point for understanding broader historical complexities
+
+### Development Journey: AR Technology Evolution
+
+The project underwent several technological iterations before achieving the final interactive system:
+
+1. **Blender (Initial Drafts)** - Started with 3D modeling and animation in Blender, but this approach did not translate effectively to the AR environment
+2. **ARjs** - Attempted AR.js implementation, but encountered persistent jittering issues that compromised the visual experience
+3. **MindAR** - Explored MindAR as an alternative, but continued to experience similar motion tracking problems
+4. **8th Wall & Three.js (Final Solution)** - Successfully implemented using 8th Wall with Three.js, creating a stable motion graphics interactive system that forms the foundation for the current experience
+
+### Interactive Content Structure
+
+Each episode features:
+- **Collapsible Information Boxes** - Expandable text sections with contextual information
+- **Integrated Imagery** - Images accompany text to provide visual context and enhance understanding
+- **Interactive Graphics** - Motion graphics elements respond to user interaction, creating an engaging AR experience
 
 ## Usage
 
@@ -37,7 +64,7 @@ You can also use the [8th Wall Desktop app](https://8thwall.org/downloads) to ge
 
 ## Deployment
 
-This project contains Github Actions configuration for deployment to Github Pages, which triggers automatically by pushing the `main` branch. You can also create a production build using `npm run build`, which outputs the production build to the `dist` folder, and publish to the web using [this guide](https://8thwall.org/docs/getting-started/publishing#self-hosting-your-project).
+This project contains Github Actions configuration for deployment to Github Pages, which triggers automatically by pushing the `main` branch. You can also create a production build using `npm run [...]
 
 ## Questions?
 
