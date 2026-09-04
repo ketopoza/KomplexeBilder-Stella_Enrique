@@ -5,7 +5,7 @@ The project visualizes the complex and ever-changing nature of the political uni
 
 How can we, as designers, help researchers gain a more comprehensive view of the shifts that happen in the countries political units? Can we through this viz. understand the context of the country that is plotted? What are the effects of the historical events of the common known as the Downfall of the Ottoman Empire or the World War II? Are the invisible guidelines between countries that prevailed throughout the 20th century still in place? Or are we experiencing a paradigm shift? And lastly, are we able to predict future shifts? 
 
-![Probe img](./img/P1100263-Edit.jpg)   
+![Img1](./img/img10.jpg)   
 
 
 ### About
@@ -19,6 +19,8 @@ The thickness of each ring’s line reflects its Electoral Democracy Index <i>v2
               
 Whether the line is wavy or straight traces the Episodes of Regime Transformation identified by the ERT dataset <i>dem_ep</i> and <i> aut_ep</i>, each undulating line marking a sustained episode of democratisation or autocratisation, so that the overall pattern of the ring visualises the country’s trajectory of regime transformation over time. 
 
+![Img1](./img/img8.jpg)  
+
 ### About the Graphic 
 
 Each ring’s value is calculated from the V-Dem Electoral Democracy Index <i>v2x_polyarchy</i>, which assigns every country a score between 0 and 1 for each year, where 0 denotes a closed autocracy and 1 denotes a full electoral democracy. 
@@ -27,6 +29,9 @@ These five components are combined into a single value for each year, which is w
 
 To capture sustained periods of change, we draw on the Episodes of Regime Transformation (ERT) dataset. Rather than reading the EDI year by year, the ERT dataset identifies distinct episodes of democratisation (liberalising autocracy, democratic deepening) and autocratisation (democratic regression, autocratic regression) within the V-Dem data, flagged through the <i>dem_ep</i> and <i>aut_ep</i> episode variables. 
 It is this episodic view that allows each ring to speak not only to a single year’s value, but to the larger pattern of transformation it belongs to.  
+
+![Img1](./img/screenshot1.png)  
+![Img1](./img/screenshot2.png)  
 
 ### Development Journey: AR Technology Evolution
 
@@ -38,7 +43,9 @@ The project underwent several technological iterations before achieving the fina
 4. **MindAR** - Explored MindAR as an alternative, but continued to experience similar motion tracking problems, the jitter and its impossibility for reading static text, made me look for alternatives, where in online forums recommended the 8thWall use. 
 5. **8th Wall + Three.js + A-Frame(Final Solution)** - Successfully implemented using 8th Wall with Three.js, creating a stable motion graphics interactive system that forms the foundation for the current experience.
 8. **NGROK** - Use for the testing and debugging part of the project, that helped me to create a private tunnel frok my computer to the phone, to adapt the AR model to size.
-9. **OpenCode - Big Pickle** - As LLM for code helping. 
+9. **OpenCode - Big Pickle** - As LLM for code helping.
+
+[<img src="./img/thumbnail.png" alt="Descripción de la imagen">](https://youtu.be/rnUi1k1f-AU)
 
 ### Credits 
 Thanks to: Dr. Vanessa Boese-Schlosser, & WAVES team | WZB Berlin Social Science Center
