@@ -3,7 +3,7 @@ Academic project part of the MA program in Visual Communication -> Information D
 
 The project visualizes the complex and ever-changing nature of the political units of sovereign countries from 1900 to 2025.  Using AR, an interactive tool is created to help explain and understand the shifts between democracy and autocracy. 
 
-The goal is to design a tool that helps political science researchers gain a better understanding of political changes, identify leaders, and predict future shifts. 
+How can we, as designers, help researchers gain a more comprehensive view of the shifts that happen in the countries political units? Can we through this viz. understand the context of the country that is plotted? What are the effects of the historical events of the common known? Are the invisible guidelines between countries that prevailed throughout the 20th century still in place? Or are we experiencing a paradigm shift? And lastly, are we able to predict future shifts? 
 
 ### About
 
