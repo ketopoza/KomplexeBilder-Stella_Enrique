@@ -5,6 +5,8 @@ The project visualizes the complex and ever-changing nature of the political uni
 
 How can we, as designers, help researchers gain a more comprehensive view of the shifts that happen in the countries political units? Can we through this viz. understand the context of the country that is plotted? What are the effects of the historical events of the common known? Are the invisible guidelines between countries that prevailed throughout the 20th century still in place? Or are we experiencing a paradigm shift? And lastly, are we able to predict future shifts? 
 
+![Probe img](./img/P1100263-Edit.jpg)   
+
 ### About
 
 In the framework of the collaboration between the UdK and the WZB Berlin Social Science Center, we joined the research team “Waves of Regime Transformation” led by Dr. Vanessa Boese-Schlosser.<br><br>The following visualisations are based on a tree-ring diagram, in which each ring represents the country's democratic score according to the ERT V-Dem dataset (see About the Data). Allowing us to trace patterns in regime transformation, showing the waves of democratisation and autocratisation spanning from 1900 to 2025, reading from center outwards.
