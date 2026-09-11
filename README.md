@@ -50,12 +50,13 @@ Click on the image to go to YouTube video.
 
 ![Img1](./img/tur.jpeg)
 ![Img1](./img/ger.jpeg) 
-To check the project, open the GitHub Pages link on your phone and scan the above targets. 
+To access the project, open the GitHub Pages link on your phone and scan the above targets. 
 
 ### Credits 
-Thanks to: Dr. Vanessa Boese-Schlosser, & WAVES team | WZB Berlin Social Science Center
-           Robin Coenen 
-           Colleges of UdK
+Thanks to: 
+- Dr. Vanessa Boese-Schlosser, & WAVES team | WZB Berlin Social Science Center.
+- Robin Coenen.
+- Colleges of UdK.
            
 Dataset: V-Dem Institute. 2023. Episodes of Regime Transformation Project.
 
