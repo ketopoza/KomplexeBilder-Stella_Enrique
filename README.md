@@ -45,7 +45,12 @@ The project underwent several technological iterations before achieving the fina
 8. **NGROK** - Use for the testing and debugging part of the project, that helped me to create a private tunnel frok my computer to the phone, to adapt the AR model to size.
 9. **OpenCode - Big Pickle** - As LLM for code helping.
 
-[<img src="./img/thumbnail.png" alt="Descripción de la imagen">](https://youtu.be/rnUi1k1f-AU)
+[<img src="./img/thumbnail.png" alt="Link to showcase video">](https://youtu.be/rnUi1k1f-AU)
+Click on the image to go to YouTube video. 
+
+![Img1](./img/tur.jpeg)
+![Img1](./img/ger.jpeg) 
+To check the project, open the GitHub Pages link on your phone and scan the above targets. 
 
 ### Credits 
 Thanks to: Dr. Vanessa Boese-Schlosser, & WAVES team | WZB Berlin Social Science Center
